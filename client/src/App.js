@@ -1,23 +1,30 @@
-import logo from './logo.svg';
 import './App.css';
+import { Routes, Route } from "react-router-dom";
+import Video from './components/pages/Video';
+import Playlist from './components/pages/Playlist';
+import Navbar from './components/Navbar';
+import React, { useState, useEffect } from 'react';
+import socket from './services/socket';
+
 
 function App() {
+
+  useEffect(() => {
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('pong');
+    };
+
+  }, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Video />} />
+          <Route path="playlist" element={<Playlist />} />
+        </Routes>
     </div>
   );
 }

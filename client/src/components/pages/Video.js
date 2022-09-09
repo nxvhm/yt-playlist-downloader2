@@ -4,7 +4,7 @@ import { Grid } from "@mui/material";
 import React, { useEffect, useState } from 'react';
 import socket from './../../services/socket';
 import { isUrl } from '../../helpers/functions';
-import axios from 'axios';
+import axios from './../../services/axios';
 
 export default function Video() {
 
@@ -15,15 +15,13 @@ export default function Video() {
 
     function getVideoInfo() {
       if (urlError) return false;
-      axios.post(process.env.REACT_APP_API_URL+'/get-info', {
+      axios.post('/get-info', {
         url,
         clientId: socket.id
       }).then(res => {
         console.log(res);
       })
     }
-
-
 
     useEffect(() => {
 

@@ -8,9 +8,14 @@ import { GetVideoInfo, DownloadVideoFromSelectedFormat } from './controllers/Vid
 import { GetPlaylistInfoForm, GetPlaylistContents } from './controllers/Playlist';
 const app = express()
 const port = process.env.PORT
-const httpServer = http.createServer(app)
-const wss = new Server(httpServer);
 app.use(cors());
+const httpServer = http.createServer(app)
+const wss = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 
 app.use(express.json());

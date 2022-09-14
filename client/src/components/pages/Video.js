@@ -4,22 +4,24 @@ import { Grid } from "@mui/material";
 import React, { useEffect, useState } from 'react';
 import socket from './../../services/socket';
 import { isUrl } from '../../helpers/functions';
-import axios from './../../services/axios';
-
+import VideoModel from './../../models/Video';
+import { getVideoData } from '../../services/VideoService';
+import VideoCard from '../library/VideoCard';
 export default function Video() {
 
     const [url, setUrl] = useState(null);
     const [urlError, setErrorUrl] = useState("");
+    const [video, setVideo] = useState(false);
 
     const [isConnected, setIsConnected] = useState(socket.connected);
 
     function getVideoInfo() {
       if (urlError) return false;
-      axios.post('/get-info', {
-        url,
-        clientId: socket.id
-      }).then(res => {
-        console.log(res);
+      getVideoData(url).then(videoData => {
+        console.log(videoData);
+        setVideo(new VideoModel(videoData));
+      }).catch(err => {
+        console.log(err);
       })
     }
 
@@ -62,6 +64,8 @@ export default function Video() {
           <Grid item xs={12} alignItems="center">
             <Button variant="contained" sx={{marginTop: 3}} onClick={() => getVideoInfo()}>Download</Button>
           </Grid>  
+
+          {video ? <VideoCard data={video}></VideoCard> : null}
 
         </Grid>
       </>

@@ -7,8 +7,13 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 export default function VideoCard(props) {
+
+  if (!props.data) {
+    return false;
+  }
+
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card>
       <CardMedia
         component="img"
         height="140"
@@ -25,8 +30,8 @@ export default function VideoCard(props) {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Share</Button>
-        <Button size="small">Learn More</Button>
+        <Button size="small" onClick={() => props.mp3DownloadRequest()}>Download MP3</Button>
+        <Button size="small">Download Video</Button>
       </CardActions>
     </Card>
   );

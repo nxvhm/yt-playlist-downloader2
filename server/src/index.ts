@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 import http from 'http';
 import cors from 'cors';
 
-import { GetVideoInfo, DownloadVideoFromSelectedFormat, DownloadTest, DownloadMP3Audio } from './controllers/Video'
+import { GetVideoInfo, DownloadVideoFromSelectedFormat, DownloadMP3Audio } from './controllers/Video'
 import { GetPlaylistInfoForm, GetPlaylistContents } from './controllers/Playlist';
 const app = express()
 const port = process.env.PORT
@@ -23,7 +23,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/playlist', GetPlaylistInfoForm)
 app.post('/playlist-info', GetPlaylistContents)
-app.get('/test', DownloadTest)
 
 wss.on('connection', (socket) => {  
   console.log('a user connected', socket.id);

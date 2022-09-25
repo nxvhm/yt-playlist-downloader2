@@ -2,6 +2,7 @@ import ytdl, { videoFormat } from 'ytdl-core'
 import fs, { PathLike } from 'fs';
 import {Response, Request} from 'express';
 import { Server } from 'socket.io';
+import VideoService from '../Services/VideoService';
 
 export const GetVideoInfo = (req: Request, res: Response) => {
     let url = req.body.url;
@@ -103,12 +104,14 @@ export const DownloadMP3Audio = (wss: Server) => {
         });        
 
         let ext  = bestQualityFormat?.mimeType?.split(';')[0].split('/')[1],
-          title: string  = info.videoDetails.title.replace(' ', '_').replace('/', '_'),
+          // Replace empty spaces and dashes with underscore
+          title: string  = info.videoDetails.title.replace(' ', '_').replace('/', '_').replace(/\s/g, '_'),
           client: string = req.body.clientId,
           starttime: number,    
           filename: string = title+'.'+ext,
           downloadDir: PathLike = `public/downloaded/`,
-          destination: PathLike = downloadDir+filename;
+          destination: PathLike = downloadDir+filename,
+          convertedFile: PathLike = downloadDir+ title+'.mp3';
 
         if (!fs.existsSync(downloadDir)) {
             fs.mkdirSync(downloadDir, {recursive: true});
@@ -130,42 +133,21 @@ export const DownloadMP3Audio = (wss: Server) => {
               percents: (percent * 100).toFixed(2),
               downloaded: (downloaded / 1024 / 1024).toFixed(2),
               total: (total / 1024 / 1024).toFixed(2),
-              remainig: estimatedDownloadTime.toFixed(2)
+              remainig: estimatedDownloadTime.toFixed(2),
+              ended: false
             }
             
-            wss.to(client).emit('progress', progressMsg);
+            wss.to(client).emit('dl-progress', progressMsg);
     
         });  
         
-        video.on('end', () => {
-          res.send({success:1, error: 0, filename});
-        });
+        video.on('end', VideoService.mp3Convert(wss, client, destination, convertedFile, (success, error) => {
+            if (success) {
+                res.send({success:1, error: 0, filename});
+            } else if (!success && error) {
+                console.log(error);
+                res.send({success:0, error: 1, msg: 'Error during conversion, please try again later'});
+            }
+        }));
     }
-
-
-}
-
-
-export const DownloadTest = async (req: Request, res: Response) => {
-    let url:string = 'https://www.youtube.com/watch?v=mgtu7u9PKkI'
-    
-    let info = await ytdl.getInfo('mgtu7u9PKkI');
-    
-    console.log(info);
-
-    let bestQualityFormat: videoFormat | undefined,
-        audioFormats: Array<videoFormat> = ytdl.filterFormats(info.formats, 'audioonly');
-    
-    audioFormats.forEach(format => {
-
-        if (bestQualityFormat == undefined) {
-            bestQualityFormat = format;
-        }
-
-        if (format.audioBitrate && bestQualityFormat.audioBitrate && (format.audioBitrate > bestQualityFormat?.audioBitrate)) {
-            bestQualityFormat = format;
-        }
-    });
-
-    console.log('highestQ:', bestQualityFormat);
 }

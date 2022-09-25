@@ -3,6 +3,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { Grid } from "@mui/material";
 import LinearProgress from '@mui/material/LinearProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import socket from './../../services/socket';
@@ -15,24 +16,33 @@ export default function Video() {
     const [url, setUrl] = useState(null);
     const [urlError, setErrorUrl] = useState("");
     const [video, setVideo] = useState(false);
-    const [progress, setProgress] = useState(0);
+    const [gettingInfo, setGettingInfo] = useState(false);
+    const [downloadProgress, setDownloadProgress] = useState(0);
+    const [convertionProgress, setConvertionProgress] = useState(0);
     const [isConnected, setIsConnected] = useState(socket.connected);
+
     function getVideoInfo() {
       if (urlError) return false;
+      setGettingInfo(true);
       getVideoData(url).then(videoData => {
         console.log(videoData);
         setVideo(new VideoModel(videoData));
+        setGettingInfo(false);
       }).catch(err => {
         console.log(err);
       })
     }
 
     function mp3DownloadRequest() {
+      // Before download start, server fetches info first so we need to display 
+      // proper status
+      setGettingInfo(true);
       downloadMP3(url).then(res => {
         console.log('video cmp:', res);
-        setProgress(0);
+        setDownloadProgress(0);
       }).catch(err => {
         console.log(err);
+        setDownloadProgress(0);
       })
     }
 
@@ -46,9 +56,17 @@ export default function Video() {
         setIsConnected(false)
       });
       
-      socket.on('progress', progressMsg => {
-        console.log(progressMsg);
-        setProgress(progressMsg.percents);
+      socket.on('dl-progress', progressMsg => {
+        // set gettingInfo to false since download already started
+        setGettingInfo(false);
+        setDownloadProgress(progressMsg.ended ? 0 : parseInt(progressMsg.percents));
+      });
+
+      socket.on('convertion-progress', progressMsg => {
+        console.log('convertion-progress', progressMsg);
+        // set gettingInfo to false since download already started
+        setGettingInfo(false);
+        setConvertionProgress(progressMsg.ended ? 0 : parseInt(progressMsg.percents));
       });
 
     }, [])
@@ -59,7 +77,7 @@ export default function Video() {
       }
     }, [url])
 
-    function DownloadProgress(props) {
+    function Progress(props) {
       if (!props.progress) {
         return false;
       }
@@ -69,13 +87,26 @@ export default function Video() {
             <LinearProgress variant="determinate" value={props.progress}/>
           </Box>
           <Box sx={{ minWidth: 35 }}>
-            <Typography variant="body2" color="text.secondary">{props.progress}%</Typography>
+            <Typography variant="body2" color="text.secondary">{props.action}...{props.progress}%</Typography>
           </Box>
         </Box>
       )
     }
 
-    
+    function StatusProgress(props) {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 1 }}>
+          <Box>
+            <CircularProgress />
+          </Box>
+          <Box >
+            <Typography variant="body2" color="text.secondary" sx={{paddingTop: 1, paddingLeft: 2}}>{props.label}</Typography>
+          </Box>
+
+        </Box>
+      )
+    }
+
     return (
       <>
         <Grid container direction="row" justifyContent="center" alignItems="center" sx={{flexGrow: 1}}>
@@ -99,17 +130,15 @@ export default function Video() {
           </Grid>  
 
           <Grid item 
-            xs={12} md={2} 
+            xs={12} md={4} 
             sx={{marginTop: 5, marginBottom: 5}} 
             alignItems="center" 
             justifyContent="center">
-              <VideoCard data={video} mp3DownloadRequest={mp3DownloadRequest}></VideoCard> 
-              <DownloadProgress progress={progress}></DownloadProgress>
+              <VideoCard data={video} mp3DownloadRequest={mp3DownloadRequest}></VideoCard>
+              {gettingInfo ? <StatusProgress label="Fetching data..."></StatusProgress> : false} 
+              <Progress action="Downloading" progress={downloadProgress}></Progress>
+              <Progress action="Convertion" progress={convertionProgress}></Progress>
           </Grid>
-
-       
-
-
         </Grid>
       </>
     );

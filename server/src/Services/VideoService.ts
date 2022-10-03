@@ -2,7 +2,6 @@ import { Server } from 'socket.io';
 import fs, { PathLike } from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
 
-
 export default class VideoService {
     /**
      * 
@@ -25,7 +24,7 @@ export default class VideoService {
             socket.to(clientId).emit('dl-progress', {
                 ended: true
             });
-            
+            console.log('src:', source);
             let downloadedAudioStream = fs.createReadStream(source),
                 convertedAudioStream  = fs.createWriteStream(output),
                 totalTime = 0;
@@ -39,7 +38,6 @@ export default class VideoService {
                 // Calculate the progress 
                 const time: number = parseInt(info.timemark.replace(/:/g, ''));
                 const percent: number = Math.ceil((time / totalTime) * 100);
-                console.log('convertion:',percent+'%');
                 // Send message to the client with the convertion progress
                 socket.to(clientId).emit('convertion-progress', {
                     percents: percent,
@@ -47,12 +45,13 @@ export default class VideoService {
                 });
             })
             .on('end', function() {
-                console.log('done processing input stream');
+                downloadedAudioStream.close();
+                convertedAudioStream.close();
+                fs.unlink(source, () => {});
                 cb(1);
             })
             .on('error', function(err) {
                 cb(0, err.message);
-                console.log('an error happened: ' + err.message);
             })
             .format('mp3')
             .pipe(convertedAudioStream)

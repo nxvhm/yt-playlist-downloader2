@@ -20,7 +20,7 @@ const wss = new Server(httpServer, {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static('public'))
 app.get('/playlist', GetPlaylistInfoForm)
 app.post('/playlist-info', GetPlaylistContents)
 

@@ -3,6 +3,7 @@ import fs, { PathLike } from 'fs';
 import {Response, Request} from 'express';
 import { Server } from 'socket.io';
 import VideoService from '../Services/VideoService';
+import url from 'node:url';
 
 export const GetVideoInfo = (req: Request, res: Response) => {
     let url = req.body.url;
@@ -105,19 +106,20 @@ export const DownloadMP3Audio = (wss: Server) => {
 
         let ext  = bestQualityFormat?.mimeType?.split(';')[0].split('/')[1],
           // Replace empty spaces and dashes with underscore
-          title: string  = info.videoDetails.title.replace(' ', '_').replace('/', '_').replace(/\s/g, '_'),
+          title: string  = info.videoDetails.title.replace(' ', '_').replace('/', '_').replace(/\s/g, '_').replace('|', '_'),
           client: string = req.body.clientId,
           starttime: number,    
           filename: string = title+'.'+ext,
           downloadDir: PathLike = `public/downloaded/`,
-          destination: PathLike = downloadDir+filename,
-          convertedFile: PathLike = downloadDir+ title+'.mp3';
+          source: PathLike = downloadDir+filename,
+          convertedFilename: string = title+'.mp3',
+          destination: PathLike = downloadDir+convertedFilename;
 
         if (!fs.existsSync(downloadDir)) {
             fs.mkdirSync(downloadDir, {recursive: true});
         }
 
-        video.pipe(fs.createWriteStream(destination));    
+        video.pipe(fs.createWriteStream(source));    
     
         video.once('response', () => {
           starttime = Date.now();
@@ -141,9 +143,14 @@ export const DownloadMP3Audio = (wss: Server) => {
     
         });  
         
-        video.on('end', VideoService.mp3Convert(wss, client, destination, convertedFile, (success, error) => {
+        video.on('end', VideoService.mp3Convert(wss, client, source, destination, (success, error) => {
             if (success) {
-                res.send({success:1, error: 0, filename});
+                let downloadUrl:string = url.format({
+                    protocol: req.protocol,
+                    host: req.get('host'),
+                    pathname: 'downloaded/'+title+'.mp3'
+                })
+                res.send({success:1, error: 0, downloadUrl});
             } else if (!success && error) {
                 console.log(error);
                 res.send({success:0, error: 1, msg: 'Error during conversion, please try again later'});

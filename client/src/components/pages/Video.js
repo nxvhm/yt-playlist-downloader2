@@ -39,8 +39,6 @@ export default function Video() {
       // proper status
       setGettingInfo(true);
       downloadMP3(url).then(res => {
-        console.log('video cmp:', res);
-        console.log('dlUrl:',res.status == 200 && res.data.downloadUrl ? res.data.downloadUrl : "");
         setDownloadUrl(res.status == 200 && res.data.downloadUrl ? res.data.downloadUrl : "");
         setDownloadProgress(0);
       }).catch(err => {

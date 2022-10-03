@@ -5,11 +5,19 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-
+import Link from '@mui/material/Link';
 export default function VideoCard(props) {
 
   if (!props.data) {
     return false;
+  }
+
+  function DownloadButton(props) {
+    if (!props.downloadUrl) return false;
+
+    return (
+      <Button  href={props.downloadUrl} target="_blank" size="small">Download Audio</Button>
+    )
   }
 
   return (
@@ -30,8 +38,9 @@ export default function VideoCard(props) {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" onClick={() => props.mp3DownloadRequest()}>Download MP3</Button>
-        <Button size="small">Download Video</Button>
+        <Button size="small" onClick={() => props.mp3DownloadRequest()}>Convert MP3</Button>
+
+        <DownloadButton downloadUrl={props.downloadUrl}></DownloadButton>
       </CardActions>
     </Card>
   );

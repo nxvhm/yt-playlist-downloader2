@@ -18,6 +18,7 @@ export default function Video() {
     const [video, setVideo] = useState(false);
     const [gettingInfo, setGettingInfo] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);
+    const [downloadUrl, setDownloadUrl] = useState("");
     const [convertionProgress, setConvertionProgress] = useState(0);
     const [isConnected, setIsConnected] = useState(socket.connected);
 
@@ -39,6 +40,8 @@ export default function Video() {
       setGettingInfo(true);
       downloadMP3(url).then(res => {
         console.log('video cmp:', res);
+        console.log('dlUrl:',res.status == 200 && res.data.downloadUrl ? res.data.downloadUrl : "");
+        setDownloadUrl(res.status == 200 && res.data.downloadUrl ? res.data.downloadUrl : "");
         setDownloadProgress(0);
       }).catch(err => {
         console.log(err);
@@ -63,7 +66,6 @@ export default function Video() {
       });
 
       socket.on('convertion-progress', progressMsg => {
-        console.log('convertion-progress', progressMsg);
         // set gettingInfo to false since download already started
         setGettingInfo(false);
         setConvertionProgress(progressMsg.ended ? 0 : parseInt(progressMsg.percents));
@@ -134,7 +136,7 @@ export default function Video() {
             sx={{marginTop: 5, marginBottom: 5}} 
             alignItems="center" 
             justifyContent="center">
-              <VideoCard data={video} mp3DownloadRequest={mp3DownloadRequest}></VideoCard>
+              <VideoCard data={video} downloadUrl={downloadUrl} mp3DownloadRequest={mp3DownloadRequest}></VideoCard>
               {gettingInfo ? <StatusProgress label="Fetching data..."></StatusProgress> : false} 
               <Progress action="Downloading" progress={downloadProgress}></Progress>
               <Progress action="Convertion" progress={convertionProgress}></Progress>

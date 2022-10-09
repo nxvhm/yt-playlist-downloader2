@@ -1,5 +1,5 @@
 import 'dotenv/config' 
-import express from 'express'
+import express, {Request, Response} from 'express'
 import { Server } from "socket.io";
 import http from 'http';
 import cors from 'cors';
@@ -33,7 +33,9 @@ wss.on('connection', (socket) => {
   });
 });
 
-
+app.get('/', (req: Request, res: Response) => {
+  res.send('Hello World!')
+})
 app.post('/get-info', GetVideoInfo)
 app.post('/download-mp3', DownloadMP3Audio(wss))
 

@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  ytdownloader:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    image: ytdl-app-server-img
+    container_name: ytdl-app-server
+    ports:
+      - 3005:3006
+    volumes: 
+      - ./server/:/home/node/app

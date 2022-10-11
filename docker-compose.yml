@@ -7,6 +7,13 @@ services:
     image: ytdl-app-server-img
     container_name: ytdl-app-server
     ports:
-      - 3005:3006
+      - 3005:3005
     volumes: 
       - ./server/:/home/node/app
+  
+  redis: 
+    image: redis:7.0.5
+    restart: always
+    container_name: ytdl-redis
+    ports: 
+      - 6379:6379

@@ -1,26 +1,54 @@
 import 'dotenv/config' 
-import { Express, Request, Response } from 'express';
-export const GetPlaylistInfoForm = (req: Request, res: Response) => {
-    return res.render('playlist')
-}
-//https://youtube.googleapis.com/youtube/v3/playlistItems?playlistId=PL1IU4H9Dvninizk2jajFt_J9GuCH_fTIX&maxResults=50&part=snippet&key=
-export const GetPlaylistContents = (req: Request, res: Response) => {
+import { Request, Response } from 'express';
+import * as YoutubeHelper from '../Helpers/Youtube';
+import { body, validationResult } from 'express-validator';
+import axios from 'axios';
 
-    let url;
+export const getPlaylistItems = async (req: Request, res: Response) => {
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json(errors.array());
+    }
+
+    let playlistId: string | null;
 
     try {
 
-        url = new URL(req.body.url);
+        let url = new URL(req.body.playlist);
+        
+        if (!YoutubeHelper.isValidPlaylistUrl(url)) {
+            return res.status(400).json({
+                errors: [{
+                    msg: 'Invalid youtube url or playlist not provided',
+                    param: 'Playlist',
+                }]
+            });
+        }
+
+        playlistId = url.searchParams.get('list');
 
     } catch (error) {
-        return res.json({success: 0, error: 1, msg: (error as Error).message});
+        playlistId = req.body.playlist;
     }
-    
-    let playlistId = url.searchParams.get('list');
 
     if (!playlistId) {
-        return res.json({success: 0, error: 1, msg: 'Playlist id cannot be found'});
+        return res.status(400).json({
+            errors: [{
+                msg: 'Invalid value',
+                param: 'Playlist',
+            }]
+        });
     }
-    console.log(process.env.YT_KEY)
-    console.log('playlist to fetch info for:', playlistId);
+
+    let playlistItem = await YoutubeHelper.getPlaylistItems(playlistId);
+
+    return res.status(200).json(playlistItem);
 }
+
+export const getPlaylistItemsRequestValidator  = [
+    body('playlist').isLength({ min: 34 })
+];
+
+//https://youtube.googleapis.com/youtube/v3/playlistItems?playlistId=PL1IU4H9Dvninizk2jajFt_J9GuCH_fTIX&maxResults=50&part=snippet&key=

@@ -31,3 +31,15 @@ export function downloadMP3(url) {
 
     return p;
 }
+
+export function getPlaylistItems(playlist) {
+    const p = new Promise((resolve, reject) => {
+        axios.post('/playlist', {playlist}).then(res => {
+            res.status === 200 ? resolve(res.data) : reject(res);
+        }).catch(err => {
+            reject(err.response.data);
+        })
+    });
+
+    return p;
+}

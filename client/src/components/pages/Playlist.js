@@ -1,17 +1,42 @@
 import React, { useState } from 'react';
-import { Link } from "react-router-dom";
 import { Grid, TextField, Button } from "@mui/material";
 import * as VideoServcie from './../../services/VideoService';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import { CardActionArea } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import PlaylistItems from '../library/PlaylistItems';
+import Fab from '@mui/material/Fab';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 export default function Video() {
+  
+  // Playlist ID or URL containing playlist ID
   const [playlistSrc, setPlaylistSrc] = useState(null);
+
+  // Error when validating or fetching the playlist
   const [playlistSrcErr, setPlaylistSrcErr] = useState('');
+
+  // Playlist items
   const [items, setItems] = useState([]);
+
+  // Items selected for download
+  const [selected, setSelected] = useState([]);
+
+  /**
+   * @param {bool} checked 
+   * @param {string} videoId 
+   */
+  function selectionUpdate(checked, videoId) {
+    if (checked) {
+      selected.push(videoId);
+      // Add video id to download selection
+      setSelected(selected);
+    }
+    else {
+      // Remove Item from download selection 
+      let index2remove = selected.indexOf(videoId);
+      selected.splice(index2remove, 1);
+      setSelected(selected);
+    }
+
+  }
 
   function getInfo() {
     if (!playlistSrc || !playlistSrc.length) {
@@ -19,7 +44,6 @@ export default function Video() {
       return false;
     }
     VideoServcie.getPlaylistItems(playlistSrc).then(items => {
-      console.log(items);
       setItems(items);
     }).catch(errorResponse => {
 
@@ -31,45 +55,12 @@ export default function Video() {
     });
   }
 
-  function PlaylistElement() {
-    if (!items.length) {
-      return false;
-    }
-
-    return (items.map(item => {
-      let thumbUrl = "";
-
-      if (item.snippet.thumbnails.high) {
-        thumbUrl = item.snippet.thumbnails.high.url;
-      } else if (item.snippet.thumbnails.medium) {
-        thumbUrl = item.snippet.thumbnails.medium.url;
-      } else if (item.snippet.thumbnails.standard) {
-        thumbUrl = item.snippet.thumbnails.standard.url;
-      }
-
-      return     <Card sx={{ maxWidth: 345 }} key={item.snippet.resourceId.videoId}>
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          image={thumbUrl}
-          alt="green iguana"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {item.snippet.title}
-          </Typography>
-
-        </CardContent>
-      </CardActionArea>
-    </Card>
-    }))
-  }
 
 
   return (
     <>
-      <Grid container direction="row" justifyContent="center" alignItems="center" sx={{flexGrow: 1}}>
-        <Grid item xs={12}>
+      <Grid container direction="row" justifyContent="center" alignItems="center">
+        <Grid item xs={12} textAlign="center">
           <h2>Playlist Download</h2>
         </Grid>
 
@@ -84,12 +75,15 @@ export default function Video() {
             />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={12} textAlign="center">
             <Button variant="contained" sx={{marginTop: 3}} onClick={() => getInfo()}>Get Playlist Videos</Button>
         </Grid>  
-
-        <PlaylistElement></PlaylistElement>
-
+        <Grid item xs={12} md={6} lg={6}>
+          <PlaylistItems items={items}  selectionUpdate={selectionUpdate} selected={selected}></PlaylistItems>
+        </Grid>
+        <Fab color="primary" aria-label="add" style={{position: 'fixed', bottom: 10, right: 10}}>
+          <DownloadForOfflineIcon />
+        </Fab>
       </Grid>
     </>
   );

@@ -11,7 +11,7 @@ export const getPlaylistItemsUrl = (playlistId: string, nextPageToken: string = 
 
     let itemsLimit = process.env.YT_PLAYLIST_MAX_ITEMS 
         ? +process.env.YT_PLAYLIST_MAX_ITEMS
-        : 25;
+        : 50;
     let requestUrl = `https://youtube.googleapis.com/youtube/v3/playlistItems?playlistId=${playlistId}&maxResults=${itemsLimit}&part=snippet&key=${process.env.YT_KEY}`;
     
     if (nextPageToken && nextPageToken.length) {

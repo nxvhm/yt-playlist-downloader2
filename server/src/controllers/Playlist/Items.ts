@@ -1,10 +1,9 @@
 import 'dotenv/config' 
 import { Request, Response } from 'express';
-import * as YoutubeHelper from '../Helpers/Youtube';
+import * as YoutubeHelper from './../../Helpers/Youtube';
 import { body, validationResult } from 'express-validator';
-import axios from 'axios';
 
-export const getPlaylistItems = async (req: Request, res: Response) => {
+export const getItems = async (req: Request, res: Response) => {
 
     const errors = validationResult(req);
 
@@ -47,8 +46,6 @@ export const getPlaylistItems = async (req: Request, res: Response) => {
     return res.status(200).json(playlistItem);
 }
 
-export const getPlaylistItemsRequestValidator  = [
+export const getItemsValidator  = [
     body('playlist').isLength({ min: 34 })
 ];
-
-//https://youtube.googleapis.com/youtube/v3/playlistItems?playlistId=PL1IU4H9Dvninizk2jajFt_J9GuCH_fTIX&maxResults=50&part=snippet&key=

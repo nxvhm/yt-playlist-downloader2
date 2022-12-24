@@ -5,7 +5,8 @@ import http from 'http';
 import cors from 'cors';
 import { getRedisClient } from './Services/Redis';
 import { GetVideoInfo, DownloadVideoFromSelectedFormat, DownloadMP3Audio } from './controllers/Video'
-import * as PlaylistCtrl from './controllers/Playlist';
+import * as PlaylistItemsController from './controllers/Playlist/Items';
+import * as PlaylistDownloadController from './controllers/Playlist/Download';
 const app = express()
 const port = process.env.PORT
 app.use(cors());
@@ -21,12 +22,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'))
 
-app.post(
-  '/playlist', 
-  PlaylistCtrl.getPlaylistItemsRequestValidator,
-  PlaylistCtrl.getPlaylistItems
-);
-
 wss.on('connection', (socket) => {  
   console.log('a user connected', socket.id);
 
@@ -35,6 +30,18 @@ wss.on('connection', (socket) => {
 
   });
 });
+
+app.post(
+  '/playlist', 
+  PlaylistItemsController.getItems,
+  PlaylistItemsController.getItemsValidator
+);
+
+app.post(
+  '/playlist/download-items',
+  PlaylistDownloadController.downloadItems
+);
+
 
 app.get('/', async (req: Request, res: Response) => {
   const client = await getRedisClient()

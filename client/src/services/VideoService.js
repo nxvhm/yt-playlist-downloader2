@@ -43,3 +43,15 @@ export function getPlaylistItems(playlist) {
 
     return p;
 }
+
+export function sendMultipleVideosForDownload(videoIds) {
+    const p = new Promise((resolve, reject) => {
+        axios.post('/playlist/download-items', {ids: videoIds}).then(res => {
+            res.status === 200 ? resolve(res.data) : reject(res);
+        }).catch(err => {
+            reject(err.response.data);
+        })
+    });
+
+    return p;
+}

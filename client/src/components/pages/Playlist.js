@@ -24,7 +24,7 @@ export default function Video() {
    * @param {string} videoId 
    */
   function selectionUpdate(checked, videoId) {
-    if (checked) {
+    if (checked && selected.indexOf(videoId) === -1) {
       selected.push(videoId);
       // Add video id to download selection
       setSelected(selected);
@@ -35,6 +35,8 @@ export default function Video() {
       selected.splice(index2remove, 1);
       setSelected(selected);
     }
+
+    console.log(selected, selected.length, selected.length ? false : true);
 
   }
 
@@ -52,6 +54,18 @@ export default function Video() {
             ? `${errorResponse[0].msg} for ${errorResponse[0].param}`
             : `Error during request. Check if playlist ID is valid`
         );
+    });
+  }
+
+  function downloadItems() {
+    if (!selected.length) {
+      return false;
+    }
+
+    VideoServcie.sendMultipleVideosForDownload(selected).then(response => {
+      console.log('res sendMultipleVideosForDownload', response);
+    }).catch(err => {
+      console.log('error sendMultipleVideosForDownload', err);
     });
   }
 
@@ -81,8 +95,11 @@ export default function Video() {
         <Grid item xs={12} md={6} lg={6}>
           <PlaylistItems items={items}  selectionUpdate={selectionUpdate} selected={selected}></PlaylistItems>
         </Grid>
-        <Fab color="primary" aria-label="add" style={{position: 'fixed', bottom: 10, right: 10}}>
-          <DownloadForOfflineIcon />
+        <Fab style={{position: 'fixed', bottom: 10, right: 10}}
+          color="primary" 
+          onClick={downloadItems} 
+          aria-label="add">
+            <DownloadForOfflineIcon />
         </Fab>
       </Grid>
     </>

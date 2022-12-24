@@ -17,3 +17,13 @@ services:
     container_name: ytdl-redis
     ports: 
       - 6379:6379
+
+  queue: 
+    build: 
+      context: ./queue
+      dockerfile: Dockerfile
+    image: ytdl-queue-img
+    container_name: ytdl-queue
+    volumes: 
+      - ./queue/:/home/node/bullqueue
+      - ./server/public/downloaded/:/home/node/bullqueue/files

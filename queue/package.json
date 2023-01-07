@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon startQueue.js"
+    "start": "npx nodemon startQueue.ts"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +16,7 @@
   "dependencies": {
     "bull": "^4.10.2",
     "nodemon": "^2.0.20",
+    "socket.io-client": "^4.5.4",
     "ts-node": "^10.9.1"
   }
 }

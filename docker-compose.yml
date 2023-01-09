@@ -27,3 +27,6 @@ services:
     volumes: 
       - ./queue/:/home/node/bullqueue
       - ./server/public/downloaded/:/home/node/bullqueue/files
+      - exclude:/home/node/bullqueue/node_modules
+volumes:
+  exclude: 

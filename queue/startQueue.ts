@@ -8,7 +8,7 @@ queue.on('completed', job => {
     console.log(job.data);
     console.log(`Job with id ${job.id} has been completed`);
     console.log('Video '+job.data.id+" is ready");
-}) 
+})
 
 // You can use concurrency as well: 
 queue.process(5, '/home/node/bullqueue/processor.ts');

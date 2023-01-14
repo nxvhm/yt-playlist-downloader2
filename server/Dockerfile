@@ -4,8 +4,5 @@ USER node
 WORKDIR /home/node/app
 COPY --chown=node:node ./package*.json ./
 RUN npm install
-USER root
-RUN apk add bash ffmpeg
-USER node
 EXPOSE ${PORT}
 CMD ["npm", "start"]

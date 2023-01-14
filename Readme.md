@@ -1,9 +1,8 @@
-## Audio downloader for youtube
+## Youtube Audio downloader for videos and playlist
 
 Currently supports only mp3.
 
-
-### TODO
-1. Download playlists
-2. Add docker config with preinstalled ffmpeg
-3. Add option to select the output audio format
+Consist of 3 services: 
+- Http server (based on express)
+- Queue Service (based on redis and bull queue) which is responsible for download and converting video
+- Client service containing UI (react based) for interacting with the server and the queue

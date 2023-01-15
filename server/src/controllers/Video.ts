@@ -18,14 +18,14 @@ export const GetVideoInfo = (req: Request, res: Response) => {
         return res.status(400).json(errors.array());
     }
 
-    let url = req.body.url;
+    const url = req.body.url;
 
     ytdl.getInfo(url).then(info => {
-
         return res.send({success:1, err: 0, data: {
             title: info.videoDetails.title,
             thumbnail: info.videoDetails.thumbnails[3].url,
-            formats: info.formats
+            formats: info.formats,
+            videoId: info.videoDetails.videoId
         }})
 
     }).catch(err => {
@@ -50,7 +50,9 @@ export const DownloadMP3Audio = (wss: Server) => {
             redis: { port: 6379, host: 'redis'} 
         })
 
-        videoQueue.add({id: req.body.url, clientId: req.body.clientId});
+        const videoId = ytdl.getURLVideoID(req.body.url);
+
+        videoQueue.add({videoId, clientId: req.body.clientId});
         
         return res.status(200).json({
             success: 1

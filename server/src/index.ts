@@ -6,6 +6,7 @@ import cors from 'cors';
 import * as VideoController from './controllers/Video'
 import * as PlaylistItemsController from './controllers/Playlist/Items';
 import * as PlaylistDownloadController from './controllers/Playlist/Download';
+import Messagenger from './Helpers/Messanger';
 
 const app = express()
 const port = process.env.PORT
@@ -39,55 +40,23 @@ wss.on('connection', (socket) => {
    * for download progress for specific video id and client
    */
   socket.on("dl-progress", data => {
-
-    /**
-     * Example authentication. If name/token etc. 
-     * missmatch dont emit anything to the client 
-     * */ 
-    let auth = socket.handshake.auth;
-    
-    if (!auth || !auth.name || (auth.name && auth.name != 'ytdl-queue-worker')) {
-      return false;
-    }
-    
-    socket.to(data.clientId).emit('dl-progress', {
-      videoId: data.msg.videoId,
-      percents: data.msg.percents
-    });
-
-
-    // console.log("dl-progress msg", msg);
-  })
-
+    Messagenger.downloadProgressMessageHandler(socket, data)
+  });
 
   /**
    * Message from the queue worker informing the server 
    * for download progress for specific video id and client
    */
   socket.on("convertion-progress", data => {
-
-    /**
-     * Example authentication. If name/token etc. 
-     * missmatch dont emit anything to the client 
-     * */ 
-    let auth = socket.handshake.auth;
-    
-    if (!auth || !auth.name || (auth.name && auth.name != 'ytdl-queue-worker')) {
-      return false;
-    }
-    
-    socket.to(data.clientId).emit('convertion-progress', data.msg);
-    console.log("convertion-progress", data);
+    Messagenger.convertionProgressMessageHandler(socket, data)
   })
 
 });
 
-
-
 app.post(
   '/playlist', 
-  PlaylistItemsController.getItems,
-  PlaylistItemsController.getItemsValidator
+  PlaylistItemsController.getItemsValidator,
+  PlaylistItemsController.getItems
 );
 
 app.post(

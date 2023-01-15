@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid, TextField, Button } from "@mui/material";
 import * as VideoServcie from './../../services/VideoService';
 import PlaylistItems from '../library/PlaylistItems';
 import Fab from '@mui/material/Fab';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import socket from './../../services/socket';
 
 export default function Video() {
   
@@ -18,6 +19,30 @@ export default function Video() {
 
   // Items selected for download
   const [selected, setSelected] = useState([]);
+
+  const [isConnected, setIsConnected] = useState(socket.connected);
+
+  useEffect(() => {
+
+    socket.on('connect', () => {
+      setIsConnected(true);
+    });
+
+    socket.on('disconnected', () => {
+      setIsConnected(false)
+    });
+    
+    socket.on('dl-progress', progressMsg => {
+      console.log('dl-progress playlist', progressMsg);
+      // set gettingInfo to false since download already started
+    });
+
+    socket.on('convertion-progress', progressMsg => {
+      console.log('conversion progress');
+      // set gettingInfo to false since download already started
+    });
+
+  }, [])
 
   /**
    * @param {bool} checked 

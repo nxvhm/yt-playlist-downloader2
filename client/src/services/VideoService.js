@@ -8,6 +8,8 @@ export function getVideoData(url) {
         .then(res => {
             console.log(res.data);
             res.status === 200 && res.data.err === 0 ? resolve(res.data.data) : reject(res.data.msg);
+        }).catch(err => {
+            reject(err.response.data);
         })
     });
 
@@ -46,7 +48,10 @@ export function getPlaylistItems(playlist) {
 
 export function sendMultipleVideosForDownload(videoIds) {
     const p = new Promise((resolve, reject) => {
-        axios.post('/playlist/download-items', {ids: videoIds}).then(res => {
+        axios.post('/playlist/download-items', {
+            ids: videoIds,
+            clientId: socket.id
+        }).then(res => {
             res.status === 200 ? resolve(res.data) : reject(res);
         }).catch(err => {
             reject(err.response.data);

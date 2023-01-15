@@ -25,12 +25,18 @@ export default function Video() {
     function getVideoInfo() {
       if (urlError) return false;
       setGettingInfo(true);
+
       getVideoData(url).then(videoData => {
         console.log(videoData);
         setVideo(new VideoModel(videoData));
         setGettingInfo(false);
       }).catch(err => {
-        console.log(err);
+        setGettingInfo(false);
+        setErrorUrl(
+          typeof err == 'object' && err[0] && err[0].msg 
+            ? err[0].msg 
+            : 'Invalid url or service not available'
+        );
       })
     }
 
@@ -58,15 +64,25 @@ export default function Video() {
       });
       
       socket.on('dl-progress', progressMsg => {
+        console.log('dl-progress video', progressMsg);
         // set gettingInfo to false since download already started
         setGettingInfo(false);
         setDownloadProgress(progressMsg.ended ? 0 : parseInt(progressMsg.percents));
       });
 
       socket.on('convertion-progress', progressMsg => {
+        console.log('convertion msg', progressMsg);
         // set gettingInfo to false since download already started
         setGettingInfo(false);
         setConvertionProgress(progressMsg.ended ? 0 : parseInt(progressMsg.percents));
+        if (progressMsg.ended && progressMsg.path) {
+          let filename = progressMsg.path.split('/').splice(-1)[0]
+          setDownloadUrl([
+            process.env.REACT_APP_API_URL,
+            'downloaded',
+            filename
+          ].join('/'));
+        }
       });
 
     }, [])
@@ -76,6 +92,12 @@ export default function Video() {
         !isUrl(url) ? setErrorUrl("Invalid url") : setErrorUrl("");
       }
     }, [url])
+
+    useEffect(() => {
+        document.title = downloadProgress 
+          ? "Downloading "+downloadProgress+"%"
+          : document.title = "YT Playlist Downloader"        
+    })
 
     function Progress(props) {
       if (!props.progress) {
@@ -110,11 +132,11 @@ export default function Video() {
     return (
       <>
         <Grid container direction="row" justifyContent="center" alignItems="center" sx={{flexGrow: 1}}>
-          <Grid item xs={12}>
+          <Grid item xs={12} textAlign="center">
             <h2>Video Download</h2>
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} p={1}>
               <TextField 
                 id="url" 
                 label="Video Url" 
@@ -125,15 +147,11 @@ export default function Video() {
               />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} textAlign="center">
             <Button variant="contained" sx={{marginTop: 3}} onClick={() => getVideoInfo()}>Get Video</Button>
           </Grid>  
 
-          <Grid item 
-            xs={12} md={4} 
-            sx={{marginTop: 5, marginBottom: 5}} 
-            alignItems="center" 
-            justifyContent="center">
+          <Grid item xs={12} sm={6} md={4} lg={3} sx={{marginTop: 5, marginBottom: 5}} p={1}>
               <VideoCard data={video} downloadUrl={downloadUrl} mp3DownloadRequest={mp3DownloadRequest}></VideoCard>
               {gettingInfo ? <StatusProgress label="Fetching data..."></StatusProgress> : false} 
               <Progress action="Downloading" progress={downloadProgress}></Progress>

@@ -4,11 +4,10 @@ import VideoService from "./VideoService";
 
 const processor =  async function(job: Job ): Promise<Object> {
     console.log('processor was called with data:', job.data);
-    const {id, clientId} = job.data;
-    
-    // SocketClient.getClient()?.emit('dl-progress', {progress: 12,clientId})
 
-    let convertor = new VideoService(clientId, id);
+    const {videoId, clientId} = job.data;
+    const convertor = new VideoService(clientId, videoId);
+
     try {
 
         // Dowload audio
@@ -17,7 +16,7 @@ const processor =  async function(job: Job ): Promise<Object> {
         // Inform client that download is completed
         SocketClient.getClient()?.emit('dl-progress', {
             clientId,
-            msg: {ended: true, videoId: id}
+            msg: {ended: true, videoId}
         })
 
         // Convert the downloaded audio
@@ -26,10 +25,10 @@ const processor =  async function(job: Job ): Promise<Object> {
         // Inform the client the conversion is completed
         SocketClient.getClient()?.emit('conversion-result', {
             clientId,
-            msg: {videoId: id, path: convertedAudio.path}
+            msg: {videoId, path: convertedAudio.path}
         })
 
-        return Promise.resolve({result:'job-completed', videoId: id});
+        return Promise.resolve({result:'job-completed', videoId});
 
     } catch (error) {
         return Promise.reject(error);

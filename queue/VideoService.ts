@@ -12,15 +12,22 @@ type DownloadResultType = {
     path: PathLike 
 }
 
+type ConversionProgressMessageType = {
+    percents: number,
+    videoId: string,
+    ended: boolean,
+    path: boolean | PathLike
+}
+
 class VideoService {
     /**
      * ID of the websocket connection whic dispatched the job
      */
     public clientId: string;
     /**
-     * The url of the video we're about to convert/download
+     * The ID of the video we're about to convert/download
      */
-    public videoUrl: string;
+    public videoId: string;
     /**
      * Instance of the socket client connection
      */
@@ -28,11 +35,11 @@ class VideoService {
     /**
      * 
      * @param clientId 
-     * @param videoUrl 
+     * @param videoId 
      */
-    constructor(clientId:string, videoUrl: string) {
+    constructor(clientId:string, videoId: string) {
         this.clientId = clientId;
-        this.videoUrl = videoUrl;
+        this.videoId = videoId;
         this.wssClient = SocketClient.getClient();
     }
     /**
@@ -65,13 +72,13 @@ class VideoService {
      */
     public async downloadAudio(): Promise<DownloadResultType> {
         let p = new Promise<DownloadResultType>(async (resolve, reject) => {
-            let info = await ytdl.getInfo(this.videoUrl);
+            let info = await ytdl.getInfo(this.videoId);
         
             let bestAudioFormat = this.getBestQualityFormat(
                 ytdl.filterFormats(info.formats, 'audioonly')
             );
 
-            const video = ytdl(this.videoUrl, {
+            const video = ytdl(this.videoId, {
                 filter: format => format.itag == bestAudioFormat?.itag
             });     
     
@@ -121,7 +128,15 @@ class VideoService {
         return  title.replace(' ', '_').replace('/', '_').replace(/\s/g, '_').replace('|', '_');
     }
 
-    private notifyDownloadProgress(chunkLength: number, downloaded: number, total: number, starttime: number) {
+    /**
+     * Send message over through ws containing dl progress data
+     * @param chunkLength 
+     * @param downloaded 
+     * @param total 
+     * @param starttime 
+     * @return void
+     */
+    private notifyDownloadProgress(chunkLength: number, downloaded: number, total: number, starttime: number): void {
         const percent = downloaded / total;
         const downloadedMinutes:number = (Date.now() - starttime) / 1000 / 60;
         const estimatedDownloadTime: number = (downloadedMinutes / percent) - downloadedMinutes;
@@ -134,13 +149,18 @@ class VideoService {
                 total: (total / 1024 / 1024).toFixed(2),
                 remainig: estimatedDownloadTime.toFixed(2),
                 ended: false,
-                videoId: this.videoUrl
+                videoId: this.videoId
             }
         }
         
         this.wssClient?.emit('dl-progress', notificationMessage);
     }
-
+    /**
+     * 
+     * @param source The filepath of the downloaded file which we're about to convert
+     * @param output The fillepath of the converted file that is going to be outputed
+     * @returns {Promise}
+     */
     public mp3Convert(source: PathLike, output: PathLike): Promise<{
             success: boolean,
             error: boolean,
@@ -161,14 +181,22 @@ class VideoService {
                 // Calculate the progress 
                 const time: number = parseInt(info.timemark.replace(/:/g, ''));
                 const percent: number = Math.ceil((time / totalTime) * 100);
-    
+                
+                let msg:ConversionProgressMessageType = {
+                    percents: percent,
+                    videoId: this.videoId,
+                    ended: percent >= 100 ? true : false,
+                    path: false
+                };
+
+                if (msg.ended) {
+                    msg.path = output;
+                }
+
                 // Send message to the client with the convertion progress
                 this.wssClient?.emit('convertion-progress', {
                     clientId: this.clientId,
-                    msg: {
-                        percents: percent,
-                        ended: percent >= 100 ? true : false
-                    }
+                    msg 
                 });
             })
             .on('end', function() {

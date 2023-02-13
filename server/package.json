@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon src/index.ts"
+    "start": "npx nodemon server/src/index.ts"
   },
   "repository": {
     "type": "git",

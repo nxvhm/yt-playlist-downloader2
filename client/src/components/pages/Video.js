@@ -84,7 +84,11 @@ export default function Video() {
           ].join('/'));
         }
       });
-
+      return () => {
+        socket.removeAllListeners('dl-progress');
+        socket.removeAllListeners('connect');
+        socket.removeAllListeners('disconnected');
+      }
     }, [])
 
     useEffect(() => {

@@ -21,6 +21,7 @@ export default function Video() {
   const [selected, setSelected] = useState([]);
 
   const [isConnected, setIsConnected] = useState(socket.connected);
+  const [downloadDisabled, setDownloadDisabled] = useState(true);
 
   useEffect(() => {
 
@@ -58,11 +59,10 @@ export default function Video() {
       // Remove Item from download selection 
       let index2remove = selected.indexOf(videoId);
       selected.splice(index2remove, 1);
-      setSelected(selected);
     }
-
-    console.log(selected, selected.length, selected.length ? false : true);
-
+    
+    setSelected(selected);
+    setDownloadDisabled(selected.length ? false : true)
   }
 
   function getInfo() {
@@ -94,8 +94,6 @@ export default function Video() {
     });
   }
 
-
-
   return (
     <>
       <Grid container direction="row" justifyContent="center" alignItems="center">
@@ -118,10 +116,15 @@ export default function Video() {
             <Button variant="contained" sx={{marginTop: 3}} onClick={() => getInfo()}>Get Playlist Videos</Button>
         </Grid>  
         <Grid item xs={12} md={6} lg={6}>
-          <PlaylistItems items={items}  selectionUpdate={selectionUpdate} selected={selected}></PlaylistItems>
+          <PlaylistItems 
+            items={items}  
+            selectionUpdate={selectionUpdate} 
+            selected={selected}>
+          </PlaylistItems>
         </Grid>
         <Fab style={{position: 'fixed', bottom: 10, right: 10}}
           color="primary" 
+          disabled={downloadDisabled}
           onClick={downloadItems} 
           aria-label="add">
             <DownloadForOfflineIcon />

@@ -3,52 +3,63 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import LinearProgress from '@mui/material/LinearProgress';
 
 export default function PlaylistItems(props) {
 
   function PlaylistCard(props) {
-    if (!props.items || (props.items && !props.items.length)) {
+    if (!props.items || (props.items && !Object.keys(props.items).length)) {
         return false;
     }
-
-    return props.items.map(item => {
-
-        let videoId = item.snippet.resourceId.videoId,
-            title = item.snippet.title,
-            description = item.snippet.description,
-            publishedAt = item.snippet.publishedAt,
-            thumbUrl = '';
-
-        if (item.snippet.thumbnails.high) {
-            thumbUrl = item.snippet.thumbnails.high.url;
-        } else if (item.snippet.thumbnails.medium) {
-            thumbUrl = item.snippet.thumbnails.medium.url;
-        } else if (item.snippet.thumbnails.standard) {
-            thumbUrl = item.snippet.thumbnails.standard.url;
-        }
+    return Object.keys(props.items).map(id => {
+      props.items[id].progress = 0;
+      let item = props.items[id],
+        thumbUrl = '';
       
+        if (item.thumbnails.high) {
+          thumbUrl = item.thumbnails.high.url;
+        } else if (item.thumbnails.medium) {
+          thumbUrl = item.thumbnails.medium.url;
+        } else if (item.thumbnails.standard) {
+          thumbUrl = item.thumbnails.standard.url;
+        }
+
         return <PlaylistItem 
-          title={title}
-          videoId={videoId}
-          description={description}
-          publishedAt={publishedAt}
+          title={item.title}
+          videoId={item.videoId}
+          description={item.description}
+          publishedAt={item.publishedAt}
           thumbUrl={thumbUrl} 
-          isChecled={props.selected.indexOf(videoId) !== -1} 
+          isChecked={props.selected.indexOf(item.videoId) !== -1} 
           selectionUpdate={props.selectionUpdate} 
-          key={videoId} 
+          key={item.videoId} 
+          progress={item.progress}
         />
     })
   }
 
+  function ProgressBar(props) {
+    if (!props.progress || !props.action) {
+      return null;
+    }
+
+    return (
+      <>
+        <LinearProgress variant="determinate" value={12}/>
+        <Typography variant="body2" color="text.secondary">{props.action}...{props.progress}%</Typography>
+      </>
+    ); 
+      
+  }
 
   function PlaylistItem(props) {  
     return (
-        <Grid container direction="row" wrap={'nowrap'} className="playlistItem" marginBottom={1}>
+        <Grid container direction="row" flexWrap={'nowrap'} className="playlistItem" marginBottom={1}>
           <Grid item paddingRight={2}>
             <img src={props.thumbUrl} style={{width: 175}} alt={props.title}></img>
           </Grid>
 
-          <Grid item>
+          <Grid item flexGrow={1} paddingRight={1}>
             <Typography component={'h3'} style={{marginTop: 0, marginBottom: 2}}>
               {props.title}
             </Typography>
@@ -67,7 +78,8 @@ export default function PlaylistItems(props) {
                   defaultChecked={props.isChecked}  />
               } 
               label="Select for download" 
-            />         
+            />
+            <ProgressBar progress={props.progress} action="downloading"></ProgressBar>
           </Grid>
         </Grid>        
     )

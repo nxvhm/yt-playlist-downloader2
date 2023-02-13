@@ -7,6 +7,7 @@ import * as VideoController from './controllers/Video'
 import * as PlaylistItemsController from './controllers/Playlist/Items';
 import * as PlaylistDownloadController from './controllers/Playlist/Download';
 import Messagenger from './Helpers/Messanger';
+import path from 'path';
 
 const app = express()
 const port = process.env.PORT
@@ -18,10 +19,9 @@ const wss = new Server(httpServer, {
     methods: ["GET", "POST"]
   }
 });
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, '/../public')))
 
 wss.on('connection', (socket) => {  
 

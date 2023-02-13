@@ -1,7 +1,6 @@
 import 'dotenv/config' 
 import axios from 'axios';
-import { isString } from 'util';
-
+import { YTVideoItem, VideoItemData } from '../types/VideoItem';
 /**
  * Build API request url
  * @param playlistId 
@@ -45,7 +44,7 @@ export const isValidPlaylistUrl = (url: URL): boolean => {
 export const getPlaylistItems = async (playlistId: string) => {
     let nextPage = true,
         nextPageToken = '',
-        items: object[] = [];
+        items: {[key:string]: VideoItemData} = {};
 
     // While next page available keep doing http requests
     // to the next page untill we got all the items
@@ -62,8 +61,21 @@ export const getPlaylistItems = async (playlistId: string) => {
                 nextPage = false;
                 return Promise.reject("API Error. Cannot get playlist data. NOT 200 OR NOT OK"); 
             }
+
+            if (response.data.items && response.data.items.length) {
+                response.data.items.forEach((item:YTVideoItem) => {
+                    items[item.snippet.resourceId.videoId] = {
+                        videoId: item.snippet.resourceId.videoId,
+                        title: item.snippet.title,
+                        description: item.snippet.description,
+                        publishedAt: item.snippet.publishedAt,
+                        thumbnails: item.snippet.thumbnails
+                    }
+                });
+            }
+
             // Merge the items from the response with the existing items
-            items.push(...response.data.items);
+            // items.push(...response.data.items);
 
             // If nextPageToken provided then we more items for this playlist,
             // so save the token and keep the doing requests

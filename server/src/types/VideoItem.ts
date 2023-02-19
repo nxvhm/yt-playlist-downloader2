@@ -39,7 +39,7 @@ export interface Default {
 export interface VideoItemData {
     videoId: string;
     title: string;
-    description: string;
+    description: null | string;
     publishedAt: Date;
     thumbnails: Thumbnails;
 }

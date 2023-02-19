@@ -5,7 +5,7 @@ import VideoService from "./VideoService";
 const processor =  async function(job: Job ): Promise<Object> {
     console.log('processor was called with data:', job.data);
 
-    const {id: videoId, clientId} = job.data;
+    const {videoId, clientId} = job.data;
     const convertor = new VideoService(clientId, videoId);
 
     try {

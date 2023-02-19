@@ -67,7 +67,8 @@ export const getPlaylistItems = async (playlistId: string) => {
                     items[item.snippet.resourceId.videoId] = {
                         videoId: item.snippet.resourceId.videoId,
                         title: item.snippet.title,
-                        description: item.snippet.description,
+                        // description: item.snippet.description,
+                        description: null,
                         publishedAt: item.snippet.publishedAt,
                         thumbnails: item.snippet.thumbnails
                     }

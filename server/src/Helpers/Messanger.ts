@@ -56,7 +56,7 @@ class Messagenger {
         }
         
         socket.to(data.clientId).emit('convertion-progress', data.msg);
-        console.log("convertion-progress", data);
+        // console.log("convertion-progress", data);
     }
 }
 

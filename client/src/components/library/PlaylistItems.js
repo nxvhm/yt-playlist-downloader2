@@ -12,7 +12,6 @@ export default function PlaylistItems(props) {
         return false;
     }
     return Object.keys(props.items).map(id => {
-      props.items[id].progress = 0;
       let item = props.items[id],
         thumbUrl = '';
       
@@ -45,7 +44,7 @@ export default function PlaylistItems(props) {
 
     return (
       <>
-        <LinearProgress variant="determinate" value={12}/>
+        <LinearProgress variant="determinate" value={parseInt(props.progress)}/>
         <Typography variant="body2" color="text.secondary">{props.action}...{props.progress}%</Typography>
       </>
     ); 

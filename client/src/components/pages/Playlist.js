@@ -15,13 +15,28 @@ export default function Video() {
   const [playlistSrcErr, setPlaylistSrcErr] = useState('');
 
   // Playlist items
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState({});
 
   // Items selected for download
   const [selected, setSelected] = useState([]);
 
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [downloadDisabled, setDownloadDisabled] = useState(true);
+  
+  /**
+   * Set item's progress and update state
+   * @param {string} videoId 
+   * @param {number} progress 
+   */
+  const updateVideoItemProgress = (videoId, progress) => {
+    setItems(prevItems => {
+      const updatedItems = {...prevItems};
+      const item = updatedItems[videoId];
+      item.progress = progress;
+      updatedItems[videoId] = item;
+      return updatedItems;
+    })
+  } 
 
   useEffect(() => {
 
@@ -35,14 +50,20 @@ export default function Video() {
     
     socket.on('dl-progress', progressMsg => {
       console.log('dl-progress playlist', progressMsg);
-      // set gettingInfo to false since download already started
+      if (progressMsg.percents) {
+          updateVideoItemProgress(progressMsg.videoId,  progressMsg.percents);
+      }
     });
-
+    
     socket.on('convertion-progress', progressMsg => {
       console.log('conversion progress');
-      // set gettingInfo to false since download already started
     });
 
+    return () => {
+      socket.removeAllListeners('dl-progress');
+      socket.removeAllListeners('convertion-progress');
+      socket.removeAllListeners('disconnected');
+    }
   }, [])
 
   /**
@@ -73,11 +94,10 @@ export default function Video() {
     VideoServcie.getPlaylistItems(playlistSrc).then(items => {
       setItems(items);
     }).catch(errorResponse => {
-
         setPlaylistSrcErr(
           errorResponse[0] && errorResponse[0].param 
             ? `${errorResponse[0].msg} for ${errorResponse[0].param}`
-            : `Error during request. Check if playlist ID is valid`
+            : `Error during request.wq Check if playlist ID is valid`
         );
     });
   }
@@ -113,7 +133,7 @@ export default function Video() {
         </Grid>
 
         <Grid item xs={12} textAlign="center">
-            <Button variant="contained" sx={{marginTop: 3}} onClick={() => getInfo()}>Get Playlist Videos</Button>
+            <Button variant="contained" sx={{marginTop: 3}} onClick={() => getInfo()}>Get Playlist Videos</Button>           
         </Grid>  
         <Grid item xs={12} md={6} lg={6}>
           <PlaylistItems 

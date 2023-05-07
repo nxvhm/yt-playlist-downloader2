@@ -47,7 +47,10 @@ export const DownloadMP3Audio = (wss: Server) => {
         }
 
         const videoQueue = new Queue(String(process.env.QUEUE_NAME), {
-            redis: { port: 6379, host: 'redis'} 
+            redis: { 
+                port: process.env.REDIS_PORT, 
+                host: process.env.REDIS_HOST
+            } 
         })
 
         const videoId = ytdl.getURLVideoID(req.body.url);

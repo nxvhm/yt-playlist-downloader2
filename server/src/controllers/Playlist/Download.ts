@@ -6,7 +6,10 @@ export const downloadItems = async(req: Request, res: Response) => {
     console.log(req.body.ids);
 
     const videoQueue = new Queue(String(process.env.QUEUE_NAME), {
-        redis: { port: 6379, host: 'redis'} 
+        redis: { 
+            port: process.env.REDIS_PORT, 
+            host: process.env.REDIS_HOST
+        } 
     })
 
     req.body.ids.forEach( (videoId: string) => {

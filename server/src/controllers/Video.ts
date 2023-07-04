@@ -3,9 +3,9 @@ import fs, { PathLike } from 'fs';
 import {Response, Request} from 'express';
 import { Server } from 'socket.io';
 import { body, validationResult } from 'express-validator';
-
 // import url from 'node:url';
 import Queue from 'bull';
+import QueueService from '../Services/QueueService';
 
 /**
  * Get video data (title, thumbnail, etc) if valid url provided
@@ -46,11 +46,11 @@ export const DownloadMP3Audio = (wss: Server) => {
             return res.status(400).json(errors.array());
         }
 
-        const videoQueue = new Queue(String(process.env.QUEUE_NAME), {
+        const videoQueue = new Queue(process.env.QUEUE_NAME || 'yt-dl-convert', {
             redis: { 
-                port: process.env.REDIS_PORT, 
-                host: process.env.REDIS_HOST
-            } 
+                host: process.env.QUEUE_NAME,
+                port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379, 
+            }
         })
 
         const videoId = ytdl.getURLVideoID(req.body.url);

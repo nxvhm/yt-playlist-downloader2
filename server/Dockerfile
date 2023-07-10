@@ -7,4 +7,4 @@ COPY --chown=node:node ./.env.example ./.env
 ENV PATH=/home/node/node_modules/.bin:$PATH
 RUN npm install
 EXPOSE ${PORT}
-CMD ["npm", "start"]
+CMD ["npm", "run", "docker-start"]

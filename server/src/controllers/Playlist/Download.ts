@@ -7,7 +7,7 @@ export const downloadItems = async(req: Request, res: Response) => {
 
     const videoQueue = new Queue(process.env.QUEUE_NAME || 'yt-dl-convert', {
         redis: { 
-            host: process.env.QUEUE_NAME,
+            host: process.env.REDIS_HOST,
             port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379, 
         }
     })

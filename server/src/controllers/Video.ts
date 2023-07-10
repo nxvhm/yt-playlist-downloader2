@@ -1,11 +1,8 @@
 import ytdl from 'ytdl-core'
-import fs, { PathLike } from 'fs';
 import {Response, Request} from 'express';
 import { Server } from 'socket.io';
 import { body, validationResult } from 'express-validator';
-// import url from 'node:url';
 import Queue from 'bull';
-import QueueService from '../Services/QueueService';
 
 /**
  * Get video data (title, thumbnail, etc) if valid url provided
@@ -18,6 +15,7 @@ export const GetVideoInfo = (req: Request, res: Response) => {
         return res.status(400).json(errors.array());
     }
 
+    console.log(process.env.QUEUE_NAME || 'yt-dl-convert', process.env.REDIS_HOST, process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379)
     const url = req.body.url;
 
     ytdl.getInfo(url).then(info => {
@@ -48,7 +46,7 @@ export const DownloadMP3Audio = (wss: Server) => {
 
         const videoQueue = new Queue(process.env.QUEUE_NAME || 'yt-dl-convert', {
             redis: { 
-                host: process.env.QUEUE_NAME,
+                host: process.env.REDIS_HOST,
                 port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379, 
             }
         })

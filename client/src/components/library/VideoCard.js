@@ -20,6 +20,16 @@ export default function VideoCard(props) {
     )
   }
 
+  const getDescription = description => {
+    if (!description || description && !description.length) {
+      return "Description not available";
+    }
+
+    return description.length > 300 
+      ? description.slice(0, 300)+'...' 
+      : description;
+  }
+
   return (
     <Card>
       <CardMedia
@@ -33,8 +43,7 @@ export default function VideoCard(props) {
           {props.data.title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000
-          species, ranging across all continents except Antarctica
+          {getDescription(props.data.description)}
         </Typography>
       </CardContent>
       <CardActions>

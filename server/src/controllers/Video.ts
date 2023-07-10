@@ -15,7 +15,6 @@ export const GetVideoInfo = (req: Request, res: Response) => {
         return res.status(400).json(errors.array());
     }
 
-    console.log(process.env.QUEUE_NAME || 'yt-dl-convert', process.env.REDIS_HOST, process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379)
     const url = req.body.url;
 
     ytdl.getInfo(url).then(info => {
@@ -23,7 +22,8 @@ export const GetVideoInfo = (req: Request, res: Response) => {
             title: info.videoDetails.title,
             thumbnail: info.videoDetails.thumbnails[3].url,
             formats: info.formats,
-            videoId: info.videoDetails.videoId
+            videoId: info.videoDetails.videoId,
+            description: info.videoDetails.description
         }})
 
     }).catch(err => {

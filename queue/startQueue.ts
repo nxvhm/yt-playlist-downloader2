@@ -1,11 +1,11 @@
 import 'dotenv/config' 
 import Queue from 'bull';
 
-const queue = new Queue(process.env.QUEUE_NAME, { 
+const queue = new Queue(process.env.QUEUE_NAME || 'yt-dl-convert', { 
     redis: { 
-        port: process.env.REDIS_PORT, 
-        host: process.env.REDIS_HOST
-    } 
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379, 
+    }
 });
 
 queue.on('completed', job => {

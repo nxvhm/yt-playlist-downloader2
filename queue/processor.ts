@@ -1,3 +1,4 @@
+import 'dotenv/config' 
 import { Job } from "bull";
 import SocketClient from "./SocketClient";
 import VideoService from "./VideoService";

@@ -1,5 +1,7 @@
 ## Youtube Audio downloader for videos and playlist
 
+![](https://github.com/nxvhm/yt-playlist-downloader2/blob/7ad908545534077a2e68a231b36518c95e57f331/server/public/assets/images/demo.gif)
+
 Currently supports only mp3.
 
 Consist of 3 services: 

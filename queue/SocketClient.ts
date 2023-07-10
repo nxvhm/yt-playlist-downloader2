@@ -6,7 +6,7 @@ class SocketClient {
     private static client: Socket;
 
     static initConnection() {
-        SocketClient.client = io(process.env.WS_ADDR, {
+        SocketClient.client = io(String(process.env.WS_ADDR), {
             reconnectionDelayMax: 10000,
             // Example auth credentials
             auth: {name: "ytdl-queue-worker"},

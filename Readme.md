@@ -13,8 +13,8 @@ Consist of 3 services:
 
 #### Docker
 
-1. Clone repository
-1.1 Provide youtube api key in `server/env.example` if you want to download playlists. 
+1. Clone repository              
+2. Provide youtube api key in `server/env.example` if you want to download playlists. 
 3. Run: ```docker-compose up -d```
 4. Start the client:
    ```

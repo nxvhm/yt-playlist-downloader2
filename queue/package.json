@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon bullqueue/startQueue.ts"
+    "docker-start": "npx nodemon bullqueue/startQueue.ts",
+    "start": "npx nodemon startQueue.ts"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "nodemon": "^2.0.20",
     "socket.io-client": "^4.5.4",
     "ts-node": "^10.9.1",
-    "ytdl-core": "^4.11.2"
+    "ytdl-core": "^4.11.4",
+    "dotenv": "^14.2.0"    
   }
 }

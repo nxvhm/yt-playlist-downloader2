@@ -1,15 +1,17 @@
+import 'dotenv/config'
 import ytdl, { videoFormat } from 'ytdl-core'
 import fs, { PathLike } from 'fs';
 import url from 'node:url';
 import SocketClient from "./SocketClient";
 import { Socket } from 'socket.io-client';
 import ffmpeg from 'fluent-ffmpeg';
+import {sep as dirSeparator} from 'path'
 
 type DownloadResultType = {
-    downloaded: boolean, 
+    downloaded: boolean,
     filename: string,
     source: PathLike,
-    path: PathLike 
+    path: PathLike
 }
 
 type ConversionProgressMessageType = {
@@ -33,9 +35,9 @@ class VideoService {
      */
     public wssClient: Socket;
     /**
-     * 
-     * @param clientId 
-     * @param videoId 
+     *
+     * @param clientId
+     * @param videoId
      */
     constructor(clientId:string, videoId: string) {
         this.clientId = clientId;
@@ -44,11 +46,11 @@ class VideoService {
     }
     /**
      * Get the highest quality audio format available for the video
-     * @param formats 
-     * @returns 
+     * @param formats
+     * @returns
      */
     public getBestQualityFormat(formats: videoFormat[]): videoFormat | undefined {
-        
+
         // The available audio formats for the video
         let audioFormats: Array<videoFormat> = ytdl.filterFormats(formats, 'audioonly');
 
@@ -59,7 +61,7 @@ class VideoService {
             if (bestQualityFormat == undefined) {
                 bestQualityFormat = format;
             }
-    
+
             if (format.audioBitrate && bestQualityFormat.audioBitrate && (format.audioBitrate > bestQualityFormat?.audioBitrate)) {
                 bestQualityFormat = format;
             }
@@ -73,44 +75,44 @@ class VideoService {
     public async downloadAudio(): Promise<DownloadResultType> {
         let p = new Promise<DownloadResultType>(async (resolve, reject) => {
             let info = await ytdl.getInfo(this.videoId);
-        
+
             let bestAudioFormat = this.getBestQualityFormat(
                 ytdl.filterFormats(info.formats, 'audioonly')
             );
 
             const video = ytdl(this.videoId, {
                 filter: format => format.itag == bestAudioFormat?.itag
-            });     
-    
+            });
+
             let ext  = bestAudioFormat?.mimeType?.split(';')[0].split('/')[1],
                 title = this.sanitizeTitle(info.videoDetails.title),
-                starttime: number,    
+                starttime: number,
                 filename: string = title+'.'+ext,
-                downloadDir: PathLike = `bullqueue/files/`,
+                downloadDir: PathLike = String(process.env.DOWNLOAD_DIR+dirSeparator),
                 source: PathLike = downloadDir+filename,
                 convertedFilename: string = title+'.mp3',
                 destination: PathLike = downloadDir+convertedFilename;
-    
+
             if (!fs.existsSync(downloadDir)) {
                 fs.mkdirSync(downloadDir, {recursive: true});
             }
-    
+
             // Start download the audio
-            video.pipe(fs.createWriteStream(source));  
-    
+            video.pipe(fs.createWriteStream(source));
+
             video.once('response', () => {
                 starttime = Date.now();
             });
-    
+
             // On progress notify the client
             video.on('progress', (chunkLength, downloaded, total) => {
                 this.notifyDownloadProgress(chunkLength, downloaded, total, starttime);
-            }); 
-    
+            });
+
             video.on('end', () => {
                 resolve({
-                    downloaded: true, 
-                    filename: title+'.mp3', 
+                    downloaded: true,
+                    filename: title+'.mp3',
                     source,
                     path: destination,
                 });
@@ -130,10 +132,10 @@ class VideoService {
 
     /**
      * Send message over through ws containing dl progress data
-     * @param chunkLength 
-     * @param downloaded 
-     * @param total 
-     * @param starttime 
+     * @param chunkLength
+     * @param downloaded
+     * @param total
+     * @param starttime
      * @return void
      */
     private notifyDownloadProgress(chunkLength: number, downloaded: number, total: number, starttime: number): void {
@@ -152,11 +154,11 @@ class VideoService {
                 videoId: this.videoId
             }
         }
-        
+
         this.wssClient?.emit('dl-progress', notificationMessage);
     }
     /**
-     * 
+     *
      * @param source The filepath of the downloaded file which we're about to convert
      * @param output The fillepath of the converted file that is going to be outputed
      * @returns {Promise}
@@ -174,14 +176,14 @@ class VideoService {
 
             ffmpeg(downloadedAudioStream)
             .on('codecData', data => {
-                totalTime = parseInt(data.duration.replace(/:/g, '')) 
+                totalTime = parseInt(data.duration.replace(/:/g, ''))
              })
              .on('progress', info => {
                 // NOTE: Do manu  al calculation since the progress field is not always available on the info param
-                // Calculate the progress 
+                // Calculate the progress
                 const time: number = parseInt(info.timemark.replace(/:/g, ''));
                 const percent: number = Math.ceil((time / totalTime) * 100);
-                
+
                 let msg:ConversionProgressMessageType = {
                     percents: percent,
                     videoId: this.videoId,
@@ -196,7 +198,7 @@ class VideoService {
                 // Send message to the client with the convertion progress
                 this.wssClient?.emit('convertion-progress', {
                     clientId: this.clientId,
-                    msg 
+                    msg
                 });
             })
             .on('end', function() {
@@ -213,11 +215,11 @@ class VideoService {
             })
             .on('error', function(err) {
                reject({
-                success:false, error: err 
+                success:false, error: err
                });
             })
             .format('mp3')
-            .pipe(convertedAudioStream)                 
+            .pipe(convertedAudioStream)
         })
 
         return result;

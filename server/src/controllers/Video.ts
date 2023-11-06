@@ -3,6 +3,7 @@ import {Response, Request} from 'express';
 import { Server } from 'socket.io';
 import { body, validationResult } from 'express-validator';
 import Queue from 'bull';
+import VideoInfo from '../models/VideoInfo';
 
 /**
  * Get video data (title, thumbnail, etc) if valid url provided
@@ -18,12 +19,13 @@ export const GetVideoInfo = (req: Request, res: Response) => {
     const url = req.body.url;
 
     ytdl.getInfo(url).then(info => {
+        const videoInfo = new VideoInfo(info);
         return res.send({success:1, err: 0, data: {
-            title: info.videoDetails.title,
+            title: videoInfo.getTitle(),
             thumbnail: info.videoDetails.thumbnails[3].url,
             formats: info.formats,
             videoId: info.videoDetails.videoId,
-            description: info.videoDetails.description
+            description: videoInfo.getDescription()
         }})
 
     }).catch(err => {

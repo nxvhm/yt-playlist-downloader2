@@ -23,8 +23,8 @@ export const GetVideoInfo = (req: Request, res: Response) => {
         return res.send({success:1, err: 0, data: {
             title: videoInfo.getTitle(),
             thumbnail: info.videoDetails.thumbnails[3].url,
-            formats: info.formats,
-            videoId: info.videoDetails.videoId,
+            formats: videoInfo.getAudioFormats(),
+            videoId: videoInfo.videoId,
             description: videoInfo.getDescription()
         }})
 

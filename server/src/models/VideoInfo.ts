@@ -21,6 +21,21 @@ class VideoInfo {
     getTitle():string {
         return this.details.title;
     }
+
+    /**
+     * Get only formats which have audio stream and no video stream
+     * @returns {Array} Array of videoFormat elements
+     */
+    getAudioFormats(): videoFormat[] {
+        const audioFormats: videoFormat[] = [];
+
+        for (let format of this.formats) {
+            if (format.hasAudio && !format.hasVideo)
+                audioFormats.push(format);
+        }
+
+        return audioFormats;
+    }
 }
 
 export default VideoInfo

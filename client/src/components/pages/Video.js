@@ -134,8 +134,10 @@ export default function Video() {
           <Grid item xs={12} textAlign="center">
             <h2>Video Download</h2>
           </Grid>
+        </Grid>
 
-          <Grid item xs={12} md={4} p={1}>
+        <Grid container direction="row" justifyContent="center" alignItems="center">
+          <Grid item xs={12} md={4}  p={1}>
             <FormGroup sx={{position: 'flex', flexDirection: 'row'}}>
               <FormControl sx={{flexGrow: 10}}>
                 <TextField InputProps={{sx:{borderTopRightRadius: 0, borderBottomRightRadius: 0}}}
@@ -153,11 +155,9 @@ export default function Video() {
               </FormControl>
             </FormGroup>
           </Grid>
+        </Grid>
 
-          <Grid item xs={12} textAlign="center">
-            {/* <Button variant="contained" sx={{marginTop: 3}} onClick={() => getVideoInfo()}>Get Video</Button> */}
-          </Grid>  
-
+        <Grid  container direction="row" justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={6} md={4} lg={3} sx={{marginTop: 5, marginBottom: 5}} p={1}>
               <VideoCard data={video} downloadUrl={downloadUrl} mp3DownloadRequest={mp3DownloadRequest}></VideoCard>
               {gettingInfo ? <StatusProgress label="Fetching data..."></StatusProgress> : false} 

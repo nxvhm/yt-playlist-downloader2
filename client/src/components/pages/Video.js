@@ -1,29 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, TextField, Button, LinearProgress, Typography, Box, CircularProgress, FormGroup, FormControl } from "@mui/material";
-import {withStyles} from '@mui/styles';
 import socket from './../../services/socket';
 import { isUrl } from '../../helpers/functions';
 import VideoModel from './../../models/Video';
 import { getVideoData, downloadMP3 } from '../../services/VideoService';
 import VideoCard from '../library/VideoCard';
-
-
-const StyledTextField = withStyles({
-  root: {
-    "& fieldset": {
-      borderTopRightRadius: 0,
-      borderBottomRightRadius: 0
-    }
-  }
-})(TextField);
-
-const StyledButton = withStyles({
-  root: {
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    textTransform: "lowercase"
-  }
-})(Button);
 
 export default function Video() {
 

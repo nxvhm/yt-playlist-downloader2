@@ -29,7 +29,7 @@ class VideoInfo {
     getAudioFormats(): videoFormat[] {
         const audioFormats: videoFormat[] = [];
 
-        for (let format of this.formats) {
+        for (const format of this.formats) {
             if (format.hasAudio && !format.hasVideo)
                 audioFormats.push(format);
         }

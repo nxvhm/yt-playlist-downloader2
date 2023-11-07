@@ -1,16 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import { Grid } from "@mui/material";
-import LinearProgress from '@mui/material/LinearProgress';
-import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import { Grid, TextField, Button, LinearProgress, Typography, Box, CircularProgress, FormGroup, FormControl } from "@mui/material";
+import {withStyles} from '@mui/styles';
 import socket from './../../services/socket';
 import { isUrl } from '../../helpers/functions';
 import VideoModel from './../../models/Video';
 import { getVideoData, downloadMP3 } from '../../services/VideoService';
 import VideoCard from '../library/VideoCard';
+
+
+const StyledTextField = withStyles({
+  root: {
+    "& fieldset": {
+      borderTopRightRadius: 0,
+      borderBottomRightRadius: 0
+    }
+  }
+})(TextField);
+
+const StyledButton = withStyles({
+  root: {
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    textTransform: "lowercase"
+  }
+})(Button);
+
 export default function Video() {
 
     const [url, setUrl] = useState(null);
@@ -141,18 +155,26 @@ export default function Video() {
           </Grid>
 
           <Grid item xs={12} md={4} p={1}>
-              <TextField 
-                id="url" 
-                label="Video Url" 
-                fullWidth={true}
-                onChange={e => setUrl(e.target.value)} 
-                error={urlError && urlError.length ? true : false}
-                helperText={urlError ?? null}
-              />
+            <FormGroup sx={{position: 'flex', flexDirection: 'row'}}>
+              <FormControl sx={{flexGrow: 10}}>
+                <TextField InputProps={{sx:{borderTopRightRadius: 0, borderBottomRightRadius: 0}}}
+                  id="url" 
+                  label="Video Url" 
+                  onChange={e => setUrl(e.target.value)} 
+                  error={urlError && urlError.length ? true : false}
+                  helperText={urlError ?? null}
+                />
+              </FormControl>
+              <FormControl sx={{flexGrow: 2}}>
+                <Button variant="contained" onClick={() => getVideoInfo()} sx={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0, padding: "15px", boxShadow: 0}}>
+                  Get Video
+                </Button>
+              </FormControl>
+            </FormGroup>
           </Grid>
 
           <Grid item xs={12} textAlign="center">
-            <Button variant="contained" sx={{marginTop: 3}} onClick={() => getVideoInfo()}>Get Video</Button>
+            {/* <Button variant="contained" sx={{marginTop: 3}} onClick={() => getVideoInfo()}>Get Video</Button> */}
           </Grid>  
 
           <Grid item xs={12} sm={6} md={4} lg={3} sx={{marginTop: 5, marginBottom: 5}} p={1}>

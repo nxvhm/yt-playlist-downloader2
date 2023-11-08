@@ -158,7 +158,7 @@ export default function Video() {
         </Grid>
 
         <Grid  container direction="row" justifyContent="center" alignItems="center">
-          <Grid item xs={12} sm={6} md={4} lg={3} sx={{marginTop: 5, marginBottom: 5}} p={1}>
+          <Grid item xs={12} sm={6} md={6} lg={4} sx={{marginTop: 5, marginBottom: 5}} p={1}>
               <VideoCard data={video} downloadUrl={downloadUrl} mp3DownloadRequest={mp3DownloadRequest}></VideoCard>
               {gettingInfo ? <StatusProgress label="Fetching data..."></StatusProgress> : false} 
               <Progress action="Downloading" progress={downloadProgress}></Progress>

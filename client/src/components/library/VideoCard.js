@@ -1,12 +1,16 @@
 import * as React from 'react';
-import {Card, CardActions, CardContent, CardMedia, Button, Typography, Box, IconButton} from '@mui/material';
+import {Card, CardContent, CardMedia, Button, Typography, Box, FormHelperText} from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+
 import {RotateRight, CloudDownload} from '@mui/icons-material';
 export default function VideoCard(props) {
 
   if (!props.data) {
     return false;
   }
-
   function DownloadButton(props) {
     if (!props.downloadUrl) return false;
 
@@ -22,9 +26,37 @@ export default function VideoCard(props) {
       return "Description not available";
     }
 
-    return description.length > 300 
-      ? description.slice(0, 300)+'...' 
+    return description.length > 500 
+      ? description.slice(0, 500)+'...' 
       : description;
+  }
+
+  const handleFormatChange = e => {
+    console.log(e);
+  }
+
+  function AudioFormatsSelect(props) {
+    if(!props.formats)
+      return false;
+
+    return (
+      <FormControl fullWidth>
+        <InputLabel id="format-selection-label">Select Format</InputLabel>
+        <Select labelId="format-selection-label" id="format-selection" label="Select format"
+          value=""
+          onChange={handleFormatChange}
+        >
+        {props.formats.map(format => {
+          return (
+            <MenuItem value={format.audioBitrate} key={'format'+format.averageBitrate}>
+              {format.container} {format.audioBitrate} KBPS
+            </MenuItem>
+          )
+        })}
+        </Select>
+        <FormHelperText>If no format selected, highest quality format will be used</FormHelperText>        
+      </FormControl>
+    )
   }
 
   return (
@@ -32,20 +64,29 @@ export default function VideoCard(props) {
       <CardMedia component="img" sx={{flexGrow: 1, flexBasis: 0}}
         image={props.data.thumbnailUrl}
         alt={props.data.title}
-      />      
+      />
       <Box sx={{flexDirection: 'column', flexGrow: 2, flexBasis: 0}}>
         <CardContent>
           <Typography component="div" variant="h5">
             {props.data.title}
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary" component="div">
+          <Typography component="div" sx={{marginTop: 1, mb: 1}}>
+            <AudioFormatsSelect formats={props.data.formats}></AudioFormatsSelect>
+          </Typography>
+          <Typography color="text.secondary" sx={{fontSize: "12px"}} component="div">
             {getDescription(props.data.description)}
           </Typography>
         </CardContent>
+
         <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
-          <Button size="small" onClick={() => props.mp3DownloadRequest()}  startIcon={<RotateRight />}>Convert MP3</Button>
+          <Button size="small" 
+            onClick={() => props.mp3DownloadRequest()}  
+            startIcon={<RotateRight />}>
+              Convert MP3
+          </Button>
           <DownloadButton downloadUrl={props.downloadUrl}></DownloadButton>
         </Box>
+
       </Box>
 
     </Card>

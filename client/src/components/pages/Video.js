@@ -11,6 +11,7 @@ export default function Video() {
     const [url, setUrl] = useState(null);
     const [urlError, setErrorUrl] = useState("");
     const [video, setVideo] = useState(false);
+    const [format, setFormat] = useState(null);
     const [gettingInfo, setGettingInfo] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [downloadUrl, setDownloadUrl] = useState("");
@@ -114,6 +115,13 @@ export default function Video() {
       )
     }
 
+    function selectFormat(bitRate) {
+      const filteredFormats = video.formats.filter(format => format.audioBitrate == bitRate);
+      if (!filteredFormats.length)
+        return false;
+      setFormat(filteredFormats[0]);
+    }
+
     function StatusProgress(props) {
       return (
         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 1 }}>
@@ -159,7 +167,7 @@ export default function Video() {
 
         <Grid  container direction="row" justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={6} md={6} lg={4} sx={{marginTop: 5, marginBottom: 5}} p={1}>
-              <VideoCard data={video} downloadUrl={downloadUrl} mp3DownloadRequest={mp3DownloadRequest}></VideoCard>
+              <VideoCard data={video} downloadUrl={downloadUrl} mp3DownloadRequest={mp3DownloadRequest} selectFormat={selectFormat} audioBitrate={format?.audioBitrate ? format.audioBitrate : ""}></VideoCard>
               {gettingInfo ? <StatusProgress label="Fetching data..."></StatusProgress> : false} 
               <Progress action="Downloading" progress={downloadProgress}></Progress>
               <Progress action="Convertion" progress={convertionProgress}></Progress>

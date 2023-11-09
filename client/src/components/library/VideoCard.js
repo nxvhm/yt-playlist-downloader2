@@ -72,7 +72,7 @@ export default function VideoCard(props) {
           <Typography component="div" variant="h5">
             {props.data.title}
           </Typography>
-          <Typography component="div" sx={{marginTop: 1, mb: 1}}>
+          <Typography component="div" sx={{marginTop: 2, mb: 2}}>
             <AudioFormatsSelect formats={props.data.formats} onChange={props.selectFormat}  audioBitrate={props.audioBitrate}/>
           </Typography>
           <Typography color="text.secondary" sx={{fontSize: "12px"}} component="div">

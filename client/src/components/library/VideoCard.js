@@ -11,6 +11,7 @@ export default function VideoCard(props) {
   if (!props.data) {
     return false;
   }
+
   function DownloadButton(props) {
     if (!props.downloadUrl) return false;
 
@@ -31,24 +32,25 @@ export default function VideoCard(props) {
       : description;
   }
 
-  const handleFormatChange = e => {
-    console.log(e);
-  }
-
   function AudioFormatsSelect(props) {
     if(!props.formats)
       return false;
-
+    
+    const defaultBitrate = Math.max(...props.formats.map(format => format.audioBitrate));
     return (
       <FormControl fullWidth>
         <InputLabel id="format-selection-label">Select Format</InputLabel>
-        <Select labelId="format-selection-label" id="format-selection" label="Select format"
-          value=""
-          onChange={handleFormatChange}
+        <Select labelId="format-selection-label" 
+          id="format-selection" label="Select format"
+          value={ props.audioBitrate || defaultBitrate}
+          onChange={e => props.onChange(e.target.value)}
         >
         {props.formats.map(format => {
           return (
-            <MenuItem value={format.audioBitrate} key={'format'+format.averageBitrate}>
+            <MenuItem 
+              value={format.audioBitrate} 
+              key={'format'+format.averageBitrate}
+            >
               {format.container} {format.audioBitrate} KBPS
             </MenuItem>
           )
@@ -71,7 +73,7 @@ export default function VideoCard(props) {
             {props.data.title}
           </Typography>
           <Typography component="div" sx={{marginTop: 1, mb: 1}}>
-            <AudioFormatsSelect formats={props.data.formats}></AudioFormatsSelect>
+            <AudioFormatsSelect formats={props.data.formats} onChange={props.selectFormat}  audioBitrate={props.audioBitrate}/>
           </Typography>
           <Typography color="text.secondary" sx={{fontSize: "12px"}} component="div">
             {getDescription(props.data.description)}

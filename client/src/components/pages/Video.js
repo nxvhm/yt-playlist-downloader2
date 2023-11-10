@@ -12,13 +12,14 @@ export default function Video() {
     const [urlError, setErrorUrl] = useState("");
     const [video, setVideo] = useState(false);
     const [format, setFormat] = useState(null);
+    const [mp3Convert, setMp3Convert] = useState(true);
     const [gettingInfo, setGettingInfo] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [downloadUrl, setDownloadUrl] = useState("");
     const [convertionProgress, setConvertionProgress] = useState(0);
     const [isConnected, setIsConnected] = useState(socket.connected);
 
-    function getVideoInfo() {
+    const getVideoInfo = () => {
       if (urlError) return false;
       setGettingInfo(true);
 
@@ -36,12 +37,12 @@ export default function Video() {
       })
     }
 
-    function mp3DownloadRequest() {
+    const mp3DownloadRequest = () => {
       // Before download start, server fetches info first so we need to display 
       // proper status
       setGettingInfo(true);
       downloadMP3(url).then(res => {
-        setDownloadUrl(res.status == 200 && res.data.downloadUrl ? res.data.downloadUrl : "");
+        setDownloadUrl(res.status === 200 && res.data.downloadUrl ? res.data.downloadUrl : "");
         setDownloadProgress(0);
       }).catch(err => {
         console.log(err);
@@ -99,6 +100,10 @@ export default function Video() {
           : document.title = "YT Playlist Downloader"        
     })
 
+    const toggleMP3Convert = e => {
+      setMp3Convert(e.target.checked)
+    }
+
     function Progress(props) {
       if (!props.progress) {
         return false;
@@ -116,7 +121,7 @@ export default function Video() {
     }
 
     function selectFormat(bitRate) {
-      const filteredFormats = video.formats.filter(format => format.audioBitrate == bitRate);
+      const filteredFormats = video.formats.filter(format => format.audioBitrate === bitRate);
       if (!filteredFormats.length)
         return false;
       setFormat(filteredFormats[0]);
@@ -167,7 +172,15 @@ export default function Video() {
 
         <Grid  container direction="row" justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={6} md={6} lg={4} sx={{marginTop: 5, marginBottom: 5}} p={1}>
-              <VideoCard data={video} downloadUrl={downloadUrl} mp3DownloadRequest={mp3DownloadRequest} selectFormat={selectFormat} audioBitrate={format?.audioBitrate ? format.audioBitrate : ""}></VideoCard>
+              <VideoCard 
+                data={video} 
+                downloadUrl={downloadUrl} 
+                mp3DownloadRequest={mp3DownloadRequest} 
+                selectFormat={selectFormat} 
+                mp3Convert={mp3Convert}
+                toggleMP3Convert={toggleMP3Convert}
+                audioBitrate={format?.audioBitrate ? format.audioBitrate : ""}>
+              </VideoCard>
               {gettingInfo ? <StatusProgress label="Fetching data..."></StatusProgress> : false} 
               <Progress action="Downloading" progress={downloadProgress}></Progress>
               <Progress action="Convertion" progress={convertionProgress}></Progress>

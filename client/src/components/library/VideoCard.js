@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {Card, CardContent, CardMedia, Button, Typography, Box, FormHelperText} from '@mui/material';
+import {Card, CardContent, CardMedia, Button, Typography, Box, FormHelperText, FormControl, FormControlLabel, Checkbox} from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import {RotateRight, CloudDownload} from '@mui/icons-material';
@@ -81,14 +80,14 @@ export default function VideoCard(props) {
         </CardContent>
 
         <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
+          <FormControlLabel control={<Checkbox checked={true} />} label="Convert to MP3" />
           <Button size="small" 
             onClick={() => props.mp3DownloadRequest()}  
             startIcon={<RotateRight />}>
-              Convert MP3
+              Download Audio
           </Button>
           <DownloadButton downloadUrl={props.downloadUrl}></DownloadButton>
         </Box>
-
       </Box>
 
     </Card>

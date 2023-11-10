@@ -80,7 +80,10 @@ export default function VideoCard(props) {
         </CardContent>
 
         <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
-          <FormControlLabel control={<Checkbox checked={true} />} label="Convert to MP3" />
+          <FormControlLabel
+            control={<Checkbox checked={props.mp3Convert} onChange={props.toggleMP3Convert} />}
+            label="Convert to MP3"
+          />
           <Button size="small" 
             onClick={() => props.mp3DownloadRequest()}  
             startIcon={<RotateRight />}>

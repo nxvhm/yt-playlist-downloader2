@@ -38,7 +38,7 @@ export const GetVideoInfo = (req: Request, res: Response) => {
  * Process incoming download request.
  * Create new donwload/convert job and send it to queue for processing
  */
-export const DownloadMP3Audio = (wss: Server) => {
+export const downloadAudio = (wss: Server) => {
     return async (req: Request, res: Response) => {
 
         const errors = validationResult(req);

@@ -69,9 +69,9 @@ app.post('/get-info',
   VideoController.GetVideoInfo,
 )
 
-app.post('/download-mp3', 
+app.post('/download-audio', 
   VideoController.VideoRequestValidator,
-  VideoController.DownloadMP3Audio(wss),
+  VideoController.downloadAudio(wss),
 )
 
 httpServer.listen(port, () => {

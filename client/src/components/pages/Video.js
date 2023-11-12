@@ -3,7 +3,7 @@ import { Grid, TextField, Button, LinearProgress, Typography, Box, CircularProgr
 import socket from './../../services/socket';
 import { isUrl } from '../../helpers/functions';
 import VideoModel from './../../models/Video';
-import { getVideoData, downloadMP3 } from '../../services/VideoService';
+import { getVideoData, downloadAudio } from '../../services/VideoService';
 import VideoCard from '../library/VideoCard';
 
 export default function Video() {
@@ -41,7 +41,7 @@ export default function Video() {
       // Before download start, server fetches info first so we need to display 
       // proper status
       setGettingInfo(true);
-      downloadMP3({url, mp3Convert}).then(res => {
+      downloadAudio({url, mp3Convert}).then(res => {
         setDownloadUrl(res.status === 200 && res.data.downloadUrl ? res.data.downloadUrl : "");
         setDownloadProgress(0);
       }).catch(err => {

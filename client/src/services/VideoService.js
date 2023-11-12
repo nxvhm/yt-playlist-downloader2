@@ -16,9 +16,9 @@ export function getVideoData(url) {
     return p;
 }
 
-export function downloadMP3(downloadRequest) {
+export function downloadAudio(downloadRequest) {
     const p = new Promise((resolve, reject) => {
-        axios.post('/download-mp3', {...downloadRequest, clientId: socket.id})
+        axios.post('/download-audio', {...downloadRequest, clientId: socket.id})
             .then(res => {
                 console.log('serverDownloadMP3Res:', res);
                 if (res.status === 200) {

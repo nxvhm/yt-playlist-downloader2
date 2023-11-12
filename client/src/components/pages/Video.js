@@ -41,7 +41,7 @@ export default function Video() {
       // Before download start, server fetches info first so we need to display 
       // proper status
       setGettingInfo(true);
-      downloadMP3(url).then(res => {
+      downloadMP3({url, mp3Convert}).then(res => {
         setDownloadUrl(res.status === 200 && res.data.downloadUrl ? res.data.downloadUrl : "");
         setDownloadProgress(0);
       }).catch(err => {

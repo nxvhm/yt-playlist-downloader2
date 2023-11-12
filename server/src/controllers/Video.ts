@@ -54,8 +54,7 @@ export const downloadAudio = (wss: Server) => {
         })
 
         const videoId = ytdl.getURLVideoID(req.body.url);
-
-        videoQueue.add({videoId, clientId: req.body.clientId});
+        videoQueue.add({videoId, mp3Convert: req.body.mp3Convert, clientId: req.body.clientId});
         
         return res.status(200).json({
             success: 1

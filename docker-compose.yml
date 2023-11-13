@@ -27,7 +27,7 @@ services:
     container_name: ytdl-queue
     volumes: 
       - ./queue/:/home/node/bullqueue
-      - ./server/public/downloaded/:/home/node/bullqueue/files
+      - ./server/public/downloaded/:/home/node/bullqueue/downloads
       - exclude:/home/node/bullqueue/node_modules
 volumes:
   exclude: 

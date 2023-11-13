@@ -88,7 +88,7 @@ class VideoService {
                 title = this.sanitizeTitle(info.videoDetails.title),
                 starttime: number,
                 filename: string = title+'.'+ext,
-                downloadDir: PathLike = String(process.env.DOWNLOAD_DIR+dirSeparator),
+                downloadDir: PathLike = String('downloads'+dirSeparator),
                 source: PathLike = downloadDir+filename,
                 convertedFilename: string = title+'.mp3',
                 destination: PathLike = downloadDir+convertedFilename;

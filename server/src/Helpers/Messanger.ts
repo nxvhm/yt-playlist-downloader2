@@ -33,14 +33,10 @@ class Messagenger {
          * */ 
         let auth = socket?.handshake.auth;
         
-        if (!auth || !auth.name || (auth.name && auth.name != 'ytdl-queue-worker')) {
+        if (!auth || !auth.name || (auth.name && auth.name != 'ytdl-queue-worker'))
             return;
-        }
         
-        socket.to(data?.clientId).emit('dl-progress', {
-            videoId: data.msg.videoId,
-            percents: data.msg.percents
-        });
+        socket.to(data?.clientId).emit('dl-progress', data.msg);
     }
 
     public static convertionProgressMessageHandler(socket: Socket, data: ConversionProgressMessage): void {
@@ -51,9 +47,8 @@ class Messagenger {
          * */ 
         let auth = socket.handshake.auth;
         
-        if (!auth || !auth.name || (auth.name && auth.name != 'ytdl-queue-worker')) {
+        if (!auth || !auth.name || (auth.name && auth.name != 'ytdl-queue-worker'))
             return;
-        }
         
         socket.to(data.clientId).emit('convertion-progress', data.msg);
         // console.log("convertion-progress", data);

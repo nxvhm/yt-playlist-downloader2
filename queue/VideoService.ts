@@ -1,25 +1,12 @@
 import 'dotenv/config'
 import ytdl, { videoFormat } from 'ytdl-core'
 import fs, { PathLike } from 'fs';
-import url from 'node:url';
 import SocketClient from "./SocketClient";
 import { Socket } from 'socket.io-client';
 import ffmpeg from 'fluent-ffmpeg';
 import {sep as dirSeparator} from 'path'
+import { DownloadResultType, ProgressMessageType, WebSocketMessage } from './types';
 
-type DownloadResultType = {
-    downloaded: boolean,
-    filename: string,
-    source: PathLike,
-    path: PathLike
-}
-
-type ConversionProgressMessageType = {
-    percents: number,
-    videoId: string,
-    ended: boolean,
-    path: boolean | PathLike
-}
 
 class VideoService {
     /**
@@ -143,14 +130,12 @@ class VideoService {
         const downloadedMinutes:number = (Date.now() - starttime) / 1000 / 60;
         const estimatedDownloadTime: number = (downloadedMinutes / percent) - downloadedMinutes;
 
-        let notificationMessage = {
+        let notificationMessage: WebSocketMessage = {
             clientId: this.clientId,
-            msg: {
-                percents: (percent * 100).toFixed(2),
-                downloaded: (downloaded / 1024 / 1024).toFixed(2),
-                total: (total / 1024 / 1024).toFixed(2),
-                remainig: estimatedDownloadTime.toFixed(2),
-                ended: false,
+            msg : {
+                percents: Number((percent * 100).toFixed(2)),
+                completed: false,
+                path: false,
                 videoId: this.videoId
             }
         }
@@ -184,16 +169,15 @@ class VideoService {
                 const time: number = parseInt(info.timemark.replace(/:/g, ''));
                 const percent: number = Math.ceil((time / totalTime) * 100);
 
-                let msg:ConversionProgressMessageType = {
+                let msg:ProgressMessageType = {
                     percents: percent,
                     videoId: this.videoId,
-                    ended: percent >= 100 ? true : false,
+                    completed: percent >= 100 ? true : false,
                     path: false
                 };
 
-                if (msg.ended) {
+                if (msg.completed)
                     msg.path = output;
-                }
 
                 // Send message to the client with the convertion progress
                 this.wssClient?.emit('convertion-progress', {

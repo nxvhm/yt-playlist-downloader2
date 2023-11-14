@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { Job } from "bull";
 import SocketClient from "./SocketClient";
 import VideoService from "./VideoService";
-
+import { WebSocketMessage, ProgressMessageType } from './types';
 const processor =  async function(job: Job ): Promise<Object> {
     console.log('processor was called with data:', job.data);
 
@@ -15,24 +15,24 @@ const processor =  async function(job: Job ): Promise<Object> {
         let downloadedAudio = await convertor.downloadAudio();
 
         // Inform client that download is completed
-        SocketClient.getClient()?.emit('dl-progress', {
+        const msg: WebSocketMessage = {
             clientId,
-            msg: {ended: true, videoId}
-        })
-
-        const resultMsg = {clientId, msg: {
-            videoId,
-            path: downloadedAudio.path
-        }}
-
-        // Convert downloaded audio if user requested
-        if (mp3Convert) {
-            let convertedAudio = await convertor.mp3Convert(downloadedAudio.source, downloadedAudio.path);
-            resultMsg.msg.path = convertedAudio.path;
+            msg: {
+                percents: 100,
+                completed: true,
+                videoId: videoId,
+                path: downloadedAudio.path.toString().replace('downloads/', '') 
+            }
         }
 
-        // Inform the client the conversion is completed
-        SocketClient.getClient()?.emit('conversion-result', resultMsg)
+        SocketClient.getClient()?.emit('dl-progress', msg)
+
+        if (mp3Convert) {
+            const convertedAudio = await convertor.mp3Convert(
+                downloadedAudio.source, 
+                downloadedAudio.path
+            );
+        }
 
         return Promise.resolve({result:'job-completed', videoId});
 

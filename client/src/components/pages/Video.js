@@ -64,15 +64,15 @@ export default function Video() {
         console.log('dl-progress video', progressMsg);
         // set gettingInfo to false since download already started
         setGettingInfo(false);
-        setDownloadProgress(progressMsg.ended ? 0 : parseInt(progressMsg.percents));
+        setDownloadProgress(progressMsg.completed ? 0 : parseInt(progressMsg.percents));
       });
 
       socket.on('convertion-progress', progressMsg => {
         console.log('convertion msg', progressMsg);
         // set gettingInfo to false since download already started
         setGettingInfo(false);
-        setConvertionProgress(progressMsg.ended ? 0 : parseInt(progressMsg.percents));
-        if (progressMsg.ended && progressMsg.path) {
+        setConvertionProgress(progressMsg.completed ? 0 : parseInt(progressMsg.percents));
+        if (progressMsg.completed && progressMsg.path) {
           let filename = progressMsg.path.split('/').splice(-1)[0]
           setDownloadUrl([
             process.env.REACT_APP_API_URL,

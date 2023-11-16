@@ -1,4 +1,4 @@
-import ytdl from 'ytdl-core'
+import ytdl from '@distube/ytdl-core';
 import {Response, Request} from 'express';
 import { Server } from 'socket.io';
 import { body, validationResult } from 'express-validator';

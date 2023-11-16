@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import ytdl, { videoFormat } from 'ytdl-core'
+import ytdl, {videoFormat} from '@distube/ytdl-core';
 import fs, { PathLike } from 'fs';
 import SocketClient from "./SocketClient";
 import { Socket } from 'socket.io-client';

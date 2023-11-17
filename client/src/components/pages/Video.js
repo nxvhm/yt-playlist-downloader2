@@ -27,6 +27,7 @@ export default function Video() {
         console.log(videoData);
         setVideo(new VideoModel(videoData));
         setGettingInfo(false);
+        setDownloadUrl("");
       }).catch(err => {
         setGettingInfo(false);
         setErrorUrl(
@@ -65,6 +66,8 @@ export default function Video() {
         // set gettingInfo to false since download already started
         setGettingInfo(false);
         setDownloadProgress(progressMsg.completed ? 0 : parseInt(progressMsg.percents));
+        if (progressMsg.completed && !mp3Convert)
+          setDownloadUrl([process.env.REACT_APP_API_URL,'downloaded',progressMsg.path].join('/'));
       });
 
       socket.on('convertion-progress', progressMsg => {
@@ -86,7 +89,7 @@ export default function Video() {
         socket.removeAllListeners('connect');
         socket.removeAllListeners('disconnected');
       }
-    }, [])
+    }, [mp3Convert])
 
     useEffect(() => {
       if (url) {

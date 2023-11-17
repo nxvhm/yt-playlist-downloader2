@@ -70,15 +70,13 @@ class VideoService {
             const video = ytdl(this.videoId, {
                 filter: format => format.itag == bestAudioFormat?.itag
             });
-
             let ext  = bestAudioFormat?.mimeType?.split(';')[0].split('/')[1],
                 title = this.sanitizeTitle(info.videoDetails.title),
                 starttime: number,
                 filename: string = title+'.'+ext,
                 downloadDir: PathLike = String('downloads'+dirSeparator),
                 source: PathLike = downloadDir+filename,
-                convertedFilename: string = title+'.mp3',
-                destination: PathLike = downloadDir+convertedFilename;
+                destination: PathLike = downloadDir+filename;
 
             if (!fs.existsSync(downloadDir)) {
                 fs.mkdirSync(downloadDir, {recursive: true});

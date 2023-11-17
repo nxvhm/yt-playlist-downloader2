@@ -15,7 +15,7 @@ export default function VideoCard(props) {
     if (!props.downloadUrl) return false;
 
     return (
-      <Button  href={props.downloadUrl} target="_blank" size="small" startIcon={<CloudDownload />}>
+      <Button  href={props.downloadUrl} variant="contained" target="_blank" size="small" startIcon={<CloudDownload />}>
         Download Audio
       </Button>
     )
@@ -84,11 +84,11 @@ export default function VideoCard(props) {
             control={<Checkbox checked={props.mp3Convert} onChange={props.toggleMP3Convert} />}
             label="Convert to MP3"
           />
-          <Button size="small" 
+          {!props.downloadUrl && <Button size="small"
             onClick={() => props.mp3DownloadRequest()}  
             startIcon={<RotateRight />}>
               Download Audio
-          </Button>
+          </Button>}
           <DownloadButton downloadUrl={props.downloadUrl}></DownloadButton>
         </Box>
       </Box>

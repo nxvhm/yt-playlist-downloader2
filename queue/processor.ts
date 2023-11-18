@@ -13,7 +13,6 @@ const processor =  async function(job: Job ): Promise<Object> {
 
         // Dowload audio
         let downloadedAudio = await convertor.downloadAudio();
-
         // Inform client that download is completed
         const msg: WebSocketMessage = {
             clientId,
@@ -37,6 +36,7 @@ const processor =  async function(job: Job ): Promise<Object> {
         return Promise.resolve({result:'job-completed', videoId});
 
     } catch (error) {
+        console.log('Jon error:', error);
         return Promise.reject(error);
     }
 }

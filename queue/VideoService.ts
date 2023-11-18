@@ -97,9 +97,10 @@ class VideoService {
             video.on('end', () => {
                 resolve({
                     downloaded: true,
-                    filename: title+'.mp3',
+                    filename,
                     source,
                     path: destination,
+                    extension: ext,
                 });
             });
 

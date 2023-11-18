@@ -4,7 +4,8 @@ export type DownloadResultType = {
     downloaded: boolean,
     filename: string,
     source: PathLike,
-    path: PathLike
+    path: PathLike,
+    extension: string
 }
 
 export type ProgressMessageType = {

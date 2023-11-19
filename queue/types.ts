@@ -5,7 +5,7 @@ export type DownloadResultType = {
     filename: string,
     source: PathLike,
     path: PathLike,
-    extension: string
+    extension: string | undefined
 }
 
 export type ProgressMessageType = {

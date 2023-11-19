@@ -13,6 +13,7 @@ const processor =  async function(job: Job ): Promise<Object> {
 
         // Dowload audio
         let downloadedAudio = await convertor.downloadAudio();
+
         // Inform client that download is completed
         const msg: WebSocketMessage = {
             clientId,
@@ -23,15 +24,12 @@ const processor =  async function(job: Job ): Promise<Object> {
                 path: downloadedAudio.path.toString().replace('downloads/', '') 
             }
         }
-
         SocketClient.getClient()?.emit('dl-progress', msg)
 
-        if (mp3Convert) {
-            const convertedAudio = await convertor.mp3Convert(
-                downloadedAudio.source, 
-                downloadedAudio.path
-            );
-        }
+        mp3Convert && await convertor.mp3Convert(
+            downloadedAudio.source,
+            String(downloadedAudio.source).replace(String(downloadedAudio.extension), 'mp3')
+        );
 
         return Promise.resolve({result:'job-completed', videoId});
 

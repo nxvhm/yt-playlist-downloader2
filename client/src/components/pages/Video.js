@@ -17,7 +17,6 @@ export default function Video() {
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [downloadUrl, setDownloadUrl] = useState("");
     const [convertionProgress, setConvertionProgress] = useState(0);
-    const [isConnected, setIsConnected] = useState(socket.connected);
 
     const getVideoInfo = () => {
       if (urlError) return false;
@@ -52,14 +51,6 @@ export default function Video() {
     }
 
     useEffect(() => {
-
-      socket.on('connect', () => {
-        setIsConnected(true);
-      });
-
-      socket.on('disconnected', () => {
-        setIsConnected(false)
-      });
       
       socket.on('dl-progress', progressMsg => {
         console.log('dl-progress video', progressMsg);

@@ -143,18 +143,19 @@ class VideoService {
     /**
      *
      * @param source The filepath of the downloaded file which we're about to convert
-     * @param output The fillepath of the converted file that is going to be outputed
      * @returns {Promise}
      */
-    public mp3Convert(source: PathLike, output: PathLike): Promise<{
+    public mp3Convert(source: PathLike): Promise<{
             success: boolean,
             error: boolean,
             path: PathLike,
     }> {
 
         const result = new Promise<{success: boolean,error: boolean,path: PathLike}>((resolve, reject) => {
+            const sourceString = String(source);
+            const outputResult = sourceString.replace(sourceString.substring(sourceString.lastIndexOf('.')), ".mp3")
             let downloadedAudioStream = fs.createReadStream(source),
-                convertedAudioStream  = fs.createWriteStream(output),
+                convertedAudioStream  = fs.createWriteStream(outputResult),
                 totalTime = 0;
 
             ffmpeg(downloadedAudioStream)
@@ -175,7 +176,7 @@ class VideoService {
                 };
 
                 if (msg.completed)
-                    msg.path = output;
+                    msg.path = outputResult;
 
                 // Send message to the client with the convertion progress
                 this.wssClient?.emit('convertion-progress', {
@@ -191,11 +192,12 @@ class VideoService {
                 resolve({
                     success: true,
                     error: false,
-                    path: output,
+                    path: outputResult,
                 });
 
             })
             .on('error', function(err) {
+                console.log("VideoService ffmpeg error", err);
                reject({
                 success:false, error: err
                });

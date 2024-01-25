@@ -26,12 +26,8 @@ const processor =  async function(job: Job ): Promise<Object> {
         }
 
         SocketClient.getClient()?.emit('dl-progress', msg)
-
         if (mp3Convert) {
-            const convertedAudio = await convertor.mp3Convert(
-                downloadedAudio.source, 
-                downloadedAudio.path
-            );
+            const convertedAudio = await convertor.mp3Convert(downloadedAudio.source);
         }
 
         return Promise.resolve({result:'job-completed', videoId});

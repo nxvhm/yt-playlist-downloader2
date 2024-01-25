@@ -61,49 +61,52 @@ class VideoService {
      */
     public async downloadAudio(): Promise<DownloadResultType> {
         let p = new Promise<DownloadResultType>(async (resolve, reject) => {
+            let info = await ytdl.getInfo(this.videoId);
 
-            try {
+            let bestAudioFormat = this.getBestQualityFormat(
+                ytdl.filterFormats(info.formats, 'audioonly')
+            );
 
-                let info = await ytdl.getInfo(this.videoId);
-                let bestAudioFormat = this.getBestQualityFormat(
-                    ytdl.filterFormats(info.formats, 'audioonly')
-                );
+            const video = ytdl(this.videoId, {
+                filter: format => format.itag == bestAudioFormat?.itag
+            });
+            let ext  = bestAudioFormat?.mimeType?.split(';')[0].split('/')[1],
+                title = this.sanitizeTitle(info.videoDetails.title),
+                starttime: number,
+                filename: string = title+'.'+ext,
+                downloadDir: PathLike = String('downloads'+dirSeparator),
+                source: PathLike = downloadDir+filename,
+                destination: PathLike = downloadDir+filename;
 
-                const video = ytdl(this.videoId, {
-                    filter: format => format.itag == bestAudioFormat?.itag
-                });
+            if (!fs.existsSync(downloadDir)) {
+                fs.mkdirSync(downloadDir, {recursive: true});
+            }
 
-                let ext  = bestAudioFormat?.mimeType?.split(';')[0].split('/')[1],
-                    title = this.sanitizeTitle(info.videoDetails.title),
-                    starttime: number,
-                    filename: string = title+'.'+ext,
-                    downloadDir: PathLike = String('downloads'+dirSeparator),
-                    source: PathLike = downloadDir+filename,
-                    destination: PathLike = downloadDir+filename;
+            // Start download the audio
+            video.pipe(fs.createWriteStream(source));
 
-                if (!fs.existsSync(downloadDir))
-                    fs.mkdirSync(downloadDir, {recursive: true});
+            video.once('response', () => {
+                starttime = Date.now();
+            });
 
-                // Start download the audio
-                video.pipe(fs.createWriteStream(source));
-                video.once('response', () => {
-                    starttime = Date.now();
-                });
+            // On progress notify the client
+            video.on('progress', (chunkLength, downloaded, total) => {
+                this.notifyDownloadProgress(chunkLength, downloaded, total, starttime);
+            });
 
-                video.on('progress', (chunkLength, downloaded, total) => this.notifyDownloadProgress(chunkLength, downloaded, total, starttime));
-
-                video.on('end', () => resolve({
+            video.on('end', () => {
+                resolve({
                     downloaded: true,
-                    filename,
+                    filename: title+'.mp3',
                     source,
                     path: destination,
-                    extension: ext,
-                }));
+                    extension: ext
+                });
+            });
 
-                video.on('error', error => reject(error))
-            } catch (error) {
+            video.on('error', error => {
                 reject(error);
-            }            
+            })
         });
 
         return p;
@@ -141,19 +144,19 @@ class VideoService {
     /**
      *
      * @param source The filepath of the downloaded file which we're about to convert
+     * @param output The fillepath of the converted file that is going to be outputed
      * @returns {Promise}
      */
-    public mp3Convert(source: PathLike): Promise<{
+    public mp3Convert(source: PathLike, output: PathLike): Promise<{
             success: boolean,
             error: boolean,
             path: PathLike,
     }> {
 
         const result = new Promise<{success: boolean,error: boolean,path: PathLike}>((resolve, reject) => {
-            const sourceString = String(source);
-            const outputResult = sourceString.replace(sourceString.substring(sourceString.lastIndexOf('.')), ".mp3")
+            console.log(source, output);
             let downloadedAudioStream = fs.createReadStream(source),
-                convertedAudioStream  = fs.createWriteStream(outputResult),
+                convertedAudioStream  = fs.createWriteStream(output),
                 totalTime = 0;
 
             ffmpeg(downloadedAudioStream)
@@ -174,7 +177,7 @@ class VideoService {
                 };
 
                 if (msg.completed)
-                    msg.path = outputResult;
+                    msg.path = output;
 
                 // Send message to the client with the convertion progress
                 this.wssClient?.emit('convertion-progress', {
@@ -190,12 +193,11 @@ class VideoService {
                 resolve({
                     success: true,
                     error: false,
-                    path: outputResult,
+                    path: output,
                 });
 
             })
             .on('error', function(err) {
-                console.log("VideoService ffmpeg error", err);
                reject({
                 success:false, error: err
                });

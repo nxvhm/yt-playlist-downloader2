@@ -16,7 +16,7 @@ queue.on('completed', job => {
 
 queue.on('failed', (job, error) => {
     console.log("Failed: Job-" + job.id);
-    console.error('FailedJon errorMessage', error);
+    console.error('FailedJob errorMessage', error);
 });
 
 // You can use concurrency as well: 

@@ -69,9 +69,9 @@ export const VideoRequestValidator = [
     body('url').isURL(),
     body('url').custom(url => {
         
-        if (!ytdl.validateURL(url)) {
-            throw new Error('Invalid Youtube Video Url provided');            
-        }
+        if (!ytdl.validateURL(url))
+            throw new Error('Invalid Youtube Video Url provided');
+
         return true;
     })
 ];

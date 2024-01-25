@@ -24,15 +24,17 @@ const processor =  async function(job: Job ): Promise<Object> {
                 path: downloadedAudio.path.toString().replace('downloads/', '') 
             }
         }
-
         SocketClient.getClient()?.emit('dl-progress', msg)
-        if (mp3Convert) {
-            const convertedAudio = await convertor.mp3Convert(downloadedAudio.source);
-        }
+
+        mp3Convert && await convertor.mp3Convert(
+            downloadedAudio.source,
+            String(downloadedAudio.source).replace(String(downloadedAudio.extension), 'mp3')
+        );
 
         return Promise.resolve({result:'job-completed', videoId});
 
     } catch (error) {
+        console.log('Jon error:', error);
         return Promise.reject(error);
     }
 }

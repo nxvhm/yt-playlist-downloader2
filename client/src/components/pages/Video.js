@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Grid, TextField, Button, LinearProgress, Typography, Box, CircularProgress, FormGroup, FormControl } from "@mui/material";
-import socket from './../../services/socket';
 import { isUrl } from '../../helpers/functions';
 import VideoModel from './../../models/Video';
 import { getVideoData, downloadAudio } from '../../services/VideoService';
 import VideoCard from '../library/VideoCard';
+import SocketContext from '../../context/SocketContext';
 
 export default function Video() {
 
+    const socket = useContext(SocketContext)
     const [url, setUrl] = useState(null);
     const [urlError, setErrorUrl] = useState("");
     const [video, setVideo] = useState(false);
@@ -17,7 +18,6 @@ export default function Video() {
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [downloadUrl, setDownloadUrl] = useState("");
     const [convertionProgress, setConvertionProgress] = useState(0);
-    const [isConnected, setIsConnected] = useState(socket.connected);
 
     const getVideoInfo = () => {
       if (urlError) return false;
@@ -52,16 +52,7 @@ export default function Video() {
     }
 
     useEffect(() => {
-
-      socket.on('connect', () => {
-        setIsConnected(true);
-      });
-
-      socket.on('disconnected', () => {
-        setIsConnected(false)
-      });
-      
-      socket.on('dl-progress', progressMsg => {
+      socket.connection.on('dl-progress', progressMsg => {
         console.log('dl-progress video', progressMsg);
         // set gettingInfo to false since download already started
         setGettingInfo(false);
@@ -70,7 +61,7 @@ export default function Video() {
           setDownloadUrl([process.env.REACT_APP_API_URL,'downloaded',progressMsg.path].join('/'));
       });
 
-      socket.on('convertion-progress', progressMsg => {
+      socket.connection.on('convertion-progress', progressMsg => {
         console.log('convertion msg', progressMsg);
         // set gettingInfo to false since download already started
         setGettingInfo(false);
@@ -85,11 +76,11 @@ export default function Video() {
         }
       });
       return () => {
-        socket.removeAllListeners('dl-progress');
-        socket.removeAllListeners('connect');
-        socket.removeAllListeners('disconnected');
+        socket.connection.removeAllListeners('dl-progress');
+        socket.connection.removeAllListeners('convertion-progress');
+
       }
-    }, [mp3Convert])
+    }, [mp3Convert, socket])
 
     useEffect(() => {
       if (url) {

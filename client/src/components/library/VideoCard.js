@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Card, CardContent, CardMedia, Button, Typography, Box, FormHelperText, FormControl, FormControlLabel, Checkbox} from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 
 import {RotateRight, CloudDownload} from '@mui/icons-material';
 export default function VideoCard(props) {
@@ -22,7 +22,7 @@ export default function VideoCard(props) {
   }
 
   const getDescription = description => {
-    if (!description || description && !description.length) {
+    if (!description || (description && !description.length)) {
       return "Description not available";
     }
 

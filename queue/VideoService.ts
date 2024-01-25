@@ -61,51 +61,49 @@ class VideoService {
      */
     public async downloadAudio(): Promise<DownloadResultType> {
         let p = new Promise<DownloadResultType>(async (resolve, reject) => {
-            let info = await ytdl.getInfo(this.videoId);
 
-            let bestAudioFormat = this.getBestQualityFormat(
-                ytdl.filterFormats(info.formats, 'audioonly')
-            );
+            try {
 
-            const video = ytdl(this.videoId, {
-                filter: format => format.itag == bestAudioFormat?.itag
-            });
-            let ext  = bestAudioFormat?.mimeType?.split(';')[0].split('/')[1],
-                title = this.sanitizeTitle(info.videoDetails.title),
-                starttime: number,
-                filename: string = title+'.'+ext,
-                downloadDir: PathLike = String('downloads'+dirSeparator),
-                source: PathLike = downloadDir+filename,
-                destination: PathLike = downloadDir+filename;
+                let info = await ytdl.getInfo(this.videoId);
+                let bestAudioFormat = this.getBestQualityFormat(
+                    ytdl.filterFormats(info.formats, 'audioonly')
+                );
 
-            if (!fs.existsSync(downloadDir)) {
-                fs.mkdirSync(downloadDir, {recursive: true});
-            }
+                const video = ytdl(this.videoId, {
+                    filter: format => format.itag == bestAudioFormat?.itag
+                });
 
-            // Start download the audio
-            video.pipe(fs.createWriteStream(source));
+                let ext  = bestAudioFormat?.mimeType?.split(';')[0].split('/')[1],
+                    title = this.sanitizeTitle(info.videoDetails.title),
+                    starttime: number,
+                    filename: string = title+'.'+ext,
+                    downloadDir: PathLike = String('downloads'+dirSeparator),
+                    source: PathLike = downloadDir+filename,
+                    destination: PathLike = downloadDir+filename;
 
-            video.once('response', () => {
-                starttime = Date.now();
-            });
+                if (!fs.existsSync(downloadDir))
+                    fs.mkdirSync(downloadDir, {recursive: true});
 
-            // On progress notify the client
-            video.on('progress', (chunkLength, downloaded, total) => {
-                this.notifyDownloadProgress(chunkLength, downloaded, total, starttime);
-            });
+                // Start download the audio
+                video.pipe(fs.createWriteStream(source));
+                video.once('response', () => {
+                    starttime = Date.now();
+                });
 
-            video.on('end', () => {
-                resolve({
+                video.on('progress', (chunkLength, downloaded, total) => this.notifyDownloadProgress(chunkLength, downloaded, total, starttime));
+
+                video.on('end', () => resolve({
                     downloaded: true,
-                    filename: title+'.mp3',
+                    filename,
                     source,
                     path: destination,
-                });
-            });
+                    extension: ext,
+                }));
 
-            video.on('error', error => {
+                video.on('error', error => reject(error))
+            } catch (error) {
                 reject(error);
-            })
+            }            
         });
 
         return p;

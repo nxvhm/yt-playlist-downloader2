@@ -13,7 +13,7 @@ export const downloadItems = async(req: Request, res: Response) => {
     })
 
     req.body.ids.forEach( (videoId: string) => {
-        videoQueue.add({videoId, clientId: req.body.clientId});
+        videoQueue.add({videoId, mp3Convert: true, clientId: req.body.clientId});
     });
 
     return res.status(200).json({

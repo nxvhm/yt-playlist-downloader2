@@ -20,5 +20,5 @@ queue.on('failed', (job, error) => {
 });
 
 // You can use concurrency as well: 
-queue.process(5, __dirname+'/processor.ts');
+queue.process(5, __dirname+'/processor');
 console.log('YT Download & Convert queue started');

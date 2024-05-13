@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/startQueue.js",
+    "dev-start": "npx nodemon startQueue.ts",
     "docker-start": "npx nodemon bullqueue/startQueue.ts",
-    "start": "npx nodemon startQueue.ts"
+    "build": "tsc --outDir dist && cp .env dist/.env"
   },
   "author": "",
   "license": "ISC",
@@ -18,12 +20,13 @@
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.13.3",
+    "@types/node": "^20.12.11",
     "bull": "^4.10.2",
+    "dotenv": "^14.2.0",
     "fluent-ffmpeg": "^2.1.2",
     "nodemon": "^2.0.20",
     "socket.io-client": "^4.5.4",
     "ts-node": "^10.9.1",
-    "ytdl-core": "^4.11.4",
-    "dotenv": "^14.2.0"    
+    "ytdl-core": "^4.11.4"
   }
 }

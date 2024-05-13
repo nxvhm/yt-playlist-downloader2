@@ -1,6 +1,8 @@
 client/node_modules
 server/node_modules
 server/public
+server/.env
 queue/node_modules
 queue/downloads
 queue/dist
+queue/.env

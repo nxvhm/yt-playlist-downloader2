@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/yt-playlist-downloader2/static/css/main.a7c4716d.css",
-    "main.js": "/yt-playlist-downloader2/static/js/main.76214409.js",
+    "main.js": "/yt-playlist-downloader2/static/js/main.7e8e811c.js",
     "static/js/787.d5fa4d18.chunk.js": "/yt-playlist-downloader2/static/js/787.d5fa4d18.chunk.js",
     "index.html": "/yt-playlist-downloader2/index.html",
     "main.a7c4716d.css.map": "/yt-playlist-downloader2/static/css/main.a7c4716d.css.map",
-    "main.76214409.js.map": "/yt-playlist-downloader2/static/js/main.76214409.js.map",
+    "main.7e8e811c.js.map": "/yt-playlist-downloader2/static/js/main.7e8e811c.js.map",
     "787.d5fa4d18.chunk.js.map": "/yt-playlist-downloader2/static/js/787.d5fa4d18.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.a7c4716d.css",
-    "static/js/main.76214409.js"
+    "static/js/main.7e8e811c.js"
   ]
 }

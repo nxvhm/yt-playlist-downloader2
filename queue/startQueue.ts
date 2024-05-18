@@ -20,5 +20,5 @@ queue.on('failed', (job, error) => {
 });
 
 // You can use concurrency as well: 
-queue.process(5, __dirname+'/processor');
+queue.process(5, __dirname+ (process.env.NODE_ENV == 'prod' ? '/processor' : '/processor.ts'));
 console.log('YT Download & Convert queue started');

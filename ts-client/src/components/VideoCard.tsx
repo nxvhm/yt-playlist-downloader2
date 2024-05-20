@@ -11,7 +11,7 @@ export default function VideoCard(props: VideoCardPropsType) {
     return false;
   }
 
-  function DownloadButton(props) {
+  function DownloadButton(props: {downloadUrl: string}) {
     if (!props.downloadUrl) return false;
 
     return (
@@ -31,7 +31,7 @@ export default function VideoCard(props: VideoCardPropsType) {
       : description;
   }
 
-  function AudioFormatsSelect(props: {formats: videoFormat[], audioBitrate: number}) {
+  function AudioFormatsSelect(props: {formats: videoFormat[], audioBitrate: number, onChange: (val: number) => void}) {
     if(!props.formats)
       return false;
 
@@ -42,7 +42,7 @@ export default function VideoCard(props: VideoCardPropsType) {
         <Select labelId="format-selection-label"
           id="format-selection" label="Select format"
           value={ props.audioBitrate || defaultBitrate}
-          onChange={e => props.onChange(e.target.value)}
+          onChange={e => props.onChange(Number(e.target.value))}
         >
         {props.formats.map(format => {
           return (

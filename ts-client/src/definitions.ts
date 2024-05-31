@@ -9,8 +9,8 @@ export type VideoDataType = {
 }
 
 export type ProgressMessageType = {
-	progress: number,
-	action: string,
+	progress?: number,
+	action?: string,
 	label?: string
 }
 

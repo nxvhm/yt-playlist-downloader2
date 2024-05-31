@@ -94,7 +94,7 @@ export default function Video() {
 				: document.title = "YT Playlist Downloader"
 	})
 
-	const toggleMP3Convert = e => {
+	const toggleMP3Convert = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMp3Convert(e.target.checked)
 	}
 
@@ -108,7 +108,7 @@ export default function Video() {
 					<LinearProgress variant="determinate" value={props.progress}/>
 				</Box>
 				<Box sx={{ minWidth: 35 }}>
-					<Typography variant="body2" color="text.secondary">{props.action}...{props.progress}%</Typography>
+					<Typography variant="body2" color="text.secondary">{props?.action}...{props.progress}%</Typography>
 				</Box>
 			</Box>
 		)

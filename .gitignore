@@ -6,3 +6,7 @@ queue/node_modules
 queue/downloads
 queue/dist
 queue/.env
+ts-client/.env.development
+ts-client/.env.production
+ts-client/.env
+ts-client/node_modules

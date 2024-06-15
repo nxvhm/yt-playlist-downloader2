@@ -7,7 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "docker-start": "npx nodemon server/src/index.ts",
     "start": "npx nodemon src/index.ts"
-
   },
   "repository": {
     "type": "git",
@@ -26,7 +25,7 @@
   },
   "homepage": "https://github.com/nxvhm/yt-playlist-downloader#readme",
   "dependencies": {
-    "@distube/ytdl-core": "^4.13.3",
+    "@distube/ytdl-core": "^4.13.4",
     "axios": "^1.2.1",
     "bull": "^4.10.2",
     "cors": "^2.8.5",

@@ -1,4 +1,4 @@
-import { videoInfo, MoreVideoDetails, videoFormat, thumbnail } from "ytdl-core";
+import { videoInfo, MoreVideoDetails, videoFormat, thumbnail } from "@distube/ytdl-core";
 
 class VideoInfo {
 

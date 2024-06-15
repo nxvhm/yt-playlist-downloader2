@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import { body, validationResult } from 'express-validator';
 import Queue from 'bull';
 import VideoInfo from '../models/VideoInfo';
+import agent from '../Services/cookieAgent';
 
 /**
  * Get video data (title, thumbnail, etc) if valid url provided
@@ -18,7 +19,7 @@ export const GetVideoInfo = (req: Request, res: Response) => {
 
     const url = req.body.url;
 
-    ytdl.getInfo(url).then(info => {
+    ytdl.getInfo(url, {agent}).then(info => {
         const videoInfo = new VideoInfo(info);
         return res.send({success:1, err: 0, data: {
             title: videoInfo.getTitle(),

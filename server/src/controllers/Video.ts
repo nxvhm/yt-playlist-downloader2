@@ -18,7 +18,6 @@ export const GetVideoInfo = (req: Request, res: Response) => {
     }
 
     const url = req.body.url;
-
     ytdl.getInfo(url, {agent}).then(info => {
         const videoInfo = new VideoInfo(info);
         return res.send({success:1, err: 0, data: {
@@ -40,39 +39,34 @@ export const GetVideoInfo = (req: Request, res: Response) => {
  * Create new donwload/convert job and send it to queue for processing
  */
 export const downloadAudio = (wss: Server) => {
-    return async (req: Request, res: Response) => {
+	return async (req: Request, res: Response) => {
+		const errors = validationResult(req);
+		if(!errors.isEmpty())
+			return res.status(400).json(errors.array());
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json(errors.array());
-        }
+		const videoQueue = new Queue(process.env.QUEUE_NAME || 'yt-dl-convert', {
+				redis: {
+						host: process.env.REDIS_HOST,
+						port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379,
+				}
+		})
 
-        const videoQueue = new Queue(process.env.QUEUE_NAME || 'yt-dl-convert', {
-            redis: { 
-                host: process.env.REDIS_HOST,
-                port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379, 
-            }
-        })
+		const videoId = ytdl.getURLVideoID(req.body.url);
+		videoQueue.add({videoId, mp3Convert: req.body.mp3Convert, clientId: req.body.clientId});
 
-        const videoId = ytdl.getURLVideoID(req.body.url);
-        videoQueue.add({videoId, mp3Convert: req.body.mp3Convert, clientId: req.body.clientId});
-        
-        return res.status(200).json({
-            success: 1
-        });
-    }
+		return res.status(200).json({success: 1});
+	}
 }
 
 /**
  * Validator for youtube url to use for express routes
  */
 export const VideoRequestValidator = [
-    body('url').isURL(),
-    body('url').custom(url => {
-        
-        if (!ytdl.validateURL(url))
-            throw new Error('Invalid Youtube Video Url provided');
+	body('url').isURL(),
+	body('url').custom(url => {
+		if(!ytdl.validateURL(url))
+			throw new Error('Invalid Youtube Video Url provided');
 
-        return true;
-    })
+		return true;
+	})
 ];
